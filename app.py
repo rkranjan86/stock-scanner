@@ -11,18 +11,9 @@ st.set_page_config(page_title="Stock Scanner Dashboard", layout="wide")
 IST = pytz.timezone('Asia/Kolkata')
 now_ist = datetime.now(IST)
 
-# Compact Top Header
-st.markdown(
-    f"""
-    <div style='margin-top:-50px; margin-bottom:10px;'>
-        <h2 style='display:inline;'>📈 Daily Stock Breakout Dashboard</h2>
-        <span style='float:right; font-size:14px; color:gray; padding-top:10px;'>
-            📅 <b>Live Time:</b> {now_ist.strftime('%d/%m/%Y | %I:%M:%S %p IST')}
-        </span>
-    </div>
-    """, 
-    unsafe_allow_html=True
-)
+# Top Header Layout
+st.title("📈 Daily Stock Breakout Dashboard")
+st.caption(f"📅 **Live Time:** `{now_ist.strftime('%d/%m/%Y | %I:%M:%S %p IST')}`")
 
 # 1. Refresh Button Section
 if st.button("🔄 Refresh Data / Scan Now"):
@@ -31,8 +22,8 @@ if st.button("🔄 Refresh Data / Scan Now"):
 
 st.markdown("<hr style='margin:10px 0;'>", unsafe_allow_html=True)
 
-# 2. Live Market Indices (Compact Cards)
-st.markdown("##### 📊 Live Market Indices (National & Global)")
+# 2. Live Market Indices (1 Single Line Compact Display)
+st.markdown("##### 📊 Live Market Indices")
 
 @st.cache_data(ttl=60)
 def get_live_indices():
@@ -67,13 +58,13 @@ def get_live_indices():
 
 indices_info = get_live_indices()
 
-# Grid layout: 3 rows x 3 columns for 9 indices to save space
-cols = st.columns(3)
+# 9 columns in a single row
+cols = st.columns(9)
 idx_names = list(indices_info.keys())
 
 for idx, name in enumerate(idx_names):
     d = indices_info[name]
-    with cols[idx % 3]:
+    with cols[idx]:
         st.metric(label=name, value=d["price"], delta=f"{d['change']} ({d['pct']}%)")
 
 st.markdown("<hr style='margin:10px 0;'>", unsafe_allow_html=True)
