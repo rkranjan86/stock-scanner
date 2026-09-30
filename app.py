@@ -4,7 +4,7 @@ import pandas as pd
 from datetime import datetime
 import pytz
 
-st.set_page_config(page_title="Bollinger Band Stock Scanner", layout="wide")
+st.set_page_config(page_title="Bollinger Band Live Scanner", layout="wide")
 
 IST = pytz.timezone('Asia/Kolkata')
 now_ist = datetime.now(IST)
@@ -46,20 +46,22 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # Top Header
-st.title("📈 Bollinger Band Lower Cut Scanner")
+st.title("📈 Bollinger Band Advanced Live Scanner")
 st.caption(f"📅 **Live Time:** `{now_ist.strftime('%d/%m/%Y | %I:%M:%S %p IST')}`")
 
-# 1. Refresh Button
-if st.button("🔄 Refresh Data / Scan Now"):
-    st.cache_data.clear()
-    st.rerun()
+# Refresh Control Panel
+col_btn, col_auto = st.columns([1, 4])
+with col_btn:
+    if st.button("🔄 Refresh Data Now"):
+        st.cache_data.clear()
+        st.rerun()
 
 st.markdown("---")
 
-# 2. Live Market Indices (Styled Small Boxes)
+# 1. Live Market Indices (Styled Small Boxes)
 st.subheader("📊 Live Market Indices")
 
-@st.cache_data(ttl=60)
+@st.cache_data(ttl=30)
 def get_live_indices():
     indices = {
         "NIFTY 50": "^NSEI",
@@ -94,22 +96,18 @@ def get_live_indices():
 indices_info = get_live_indices()
 idx_keys = list(indices_info.keys())
 
-# Helper function to render styled HTML box
 def render_index_card(name, d):
     is_positive = d["change"] >= 0
     change_class = "index-change-pos" if is_positive else "index-change-neg"
     sign = "+" if is_positive else ""
-    
-    html_code = f"""
+    return f"""
     <div class="index-box">
         <div class="index-name">{name}</div>
         <div class="index-price">{d['price']:,}</div>
         <div class="{change_class}">{sign}{d['change']} ({sign}{d['pct']}%)</div>
     </div>
     """
-    return html_code
 
-# Row 1: 5 Boxes
 cols_row1 = st.columns(5)
 for i in range(5):
     name = idx_keys[i]
@@ -117,9 +115,8 @@ for i in range(5):
     with cols_row1[i]:
         st.markdown(render_index_card(name, d), unsafe_allow_html=True)
 
-# Row 2: 4 Boxes
-cols_row2 = st.columns(4)
-for i in range(5, 9):
+cols_row2 = st.columns(5)
+for i in range(5, 10):
     name = idx_keys[i]
     d = indices_info[name]
     with cols_row2[i - 5]:
@@ -127,63 +124,76 @@ for i in range(5, 9):
 
 st.markdown("---")
 
-# 3. Automatic & Reliable Stock List Fetcher
-@st.cache_data(ttl=86400)
-def fetch_nifty200_stocks():
-    url_primary = "https://raw.githubusercontent.com/indian-stock-market/nifty-csv/main/ind_nifty200list.csv"
-    try:
-        df = pd.read_csv(url_primary)
-        return [f"{symbol.strip()}.NS" for symbol in df['Symbol']]
-    except Exception:
-        return [
-            "ABB.NS", "ACC.NS", "AAVAS.NS", "ABBOTINDIA.NS", "ABCAPITAL.NS", "ABFRL.NS", "ADANIENSOL.NS", 
-            "ADANIENT.NS", "ADANIGREEN.NS", "ADANIPORTS.NS", "ADANIPOWER.NS", "ATGL.NS", "AWL.NS", "APLAPOLLO.NS", 
-            "ALKEM.NS", "AMBUJACEM.NS", "ANGELONE.NS", "APOLLOHOSP.NS", "APOLLOTYRE.NS", "ASHOKLEY.NS", 
-            "ASIANPAINT.NS", "ASTRAL.NS", "ATUL.NS", "AUROPHARMA.NS", "AUBANK.NS", "AXISBANK.NS", "BAJAJ-AUTO.NS", 
-            "BAJAJFINSV.NS", "BAJFINANCE.NS", "BALKRISIND.NS", "BANDHANBNK.NS", "BANKBARODA.NS", "BANKINDIA.NS", 
-            "BATAINDIA.NS", "BERGEPAINT.NS", "BEL.NS", "BHARATFORG.NS", "BHEL.NS", "BPCL.NS", "BHARTIARTL.NS", 
-            "BIOCON.NS", "BSOFT.NS", "BOSCHLTD.NS", "BRITANNIA.NS", "CANBK.NS", "CGPOWER.NS", "CHAMBLFERT.NS", 
-            "CHOLAFIN.NS", "CIPLA.NS", "COALINDIA.NS", "COFORGE.NS", "COLPAL.NS", "CONCOR.NS", "COROMANDEL.NS", 
-            "CROMPTON.NS", "CUMMINSIND.NS", "DABUR.NS", "DALBHARAT.NS", "DEEPAKNTR.NS", "DELHIVERY.NS", 
-            "DIVISLAB.NS", "DIXON.NS", "DLF.NS", "LALPATHLAB.NS", "DRREDDY.NS", "EICHERMOT.NS", "ESCORTS.NS", 
-            "EXIDEIND.NS", "FEDERALBNK.NS", "FACT.NS", "GAIL.NS", "GLENMARK.NS", "GMRAIRPORT.NS", "GODREJCP.NS", 
-            "GODREJPROP.NS", "GRASIM.NS", "GUJGASLTD.NS", "HAL.NS", "HAVELLS.NS", "HCLTECH.NS", "HDFCAMC.NS", 
-            "HDFCBANK.NS", "HDFCLIFE.NS", "HEROMOTOCO.NS", "HINDALCO.NS", "HINDCOPPER.NS", "HINDPETRO.NS", 
-            "HINDUNILVR.NS", "ICICIBANK.NS", "ICICIGI.NS", "ICICIPRULI.NS", "IDFCFIRSTB.NS", "INDIANB.NS", 
-            "INDIGO.NS", "INDUSINDBK.NS", "INDUSTOWER.NS", "INFY.NS", "IOC.NS", "IRCTC.NS", "IRFC.NS", 
-            "IREDA.NS", "IGL.NS", "NAUKRI.NS", "INOXWIND.NS", "ITC.NS", "JINDALSTEL.NS", "JIOFIN.NS", 
-            "JSWENERGY.NS", "JSWSTEEL.NS", "JUBLFOOD.NS", "KALYANKJIL.NS", "KEI.NS", "KOTAKBANK.NS", 
-            "KPITTECH.NS", "LTF.NS", "LTTS.NS", "LICHSGFIN.NS", "LICI.NS", "LTIM.NS", "LT.NS", "LUPIN.NS", 
-            "M&M.NS", "M&MFIN.NS", "MARICO.NS", "MARUTI.NS", "MAXHEALTH.NS", "MAZDOCK.NS", "METROPOLIS.NS", 
-            "MFSL.NS", "MGL.NS", "MSUMI.NS", "MPHASIS.NS", "MRF.NS", "NATIONALUM.NS", "NAVINFLUOR.NS", 
-            "NESTLEIND.NS", "NHPC.NS", "NMDC.NS", "NTPC.NS", "NYKAA.NS", "OBEROIRLTY.NS", "ONGC.NS", 
-            "OIL.NS", "PAYTM.NS", "OFSS.NS", "POLICYBZR.NS", "PIIND.NS", "PAGEIND.NS", "PERSISTENT.NS", 
-            "PETRONET.NS", "PFC.NS", "PIDILITIND.NS", "PNB.NS", "POLYCAB.NS", "POONAWALLA.NS", "POWERGRID.NS", 
-            "PRESTAGE.NS", "PVRINOX.NS", "RAMCOCEM.NS", "RCF.NS", "RECLTD.NS", "RELIANCE.NS", "RVNL.NS", 
-            "SAIL.NS", "SBICARD.NS", "SBILIFE.NS", "SBIN.NS", "SHREECEM.NS", "SHRIRAMFIN.NS", "SIEMENS.NS", 
-            "SJVN.NS", "SONACOMS.NS", "SRF.NS", "SUNPHARMA.NS", "SUNTV.NS", "SUZLON.NS", "SYNGENE.NS", 
-            "TATACOMM.NS", "TATACONSUM.NS", "TATAELXSI.NS", "TATAMOTORS.NS", "TATAPOWER.NS", "TATASTEEL.NS", 
-            "TATATECH.NS", "TCS.NS", "TECHM.NS", "TITAN.NS", "TORNTPHARM.NS", "TORNTPOWER.NS", "TRENT.NS", 
-            "TVSMOTOR.NS", "ULTRACEMCO.NS", "UNIONBANK.NS", "UPL.NS", "VBL.NS", "VEDL.NS", "IDEA.NS", 
-            "VOLTAS.NS", "WIPRO.NS", "YESBANK.NS", "ZEEL.NS", "ZOMATO.NS", "ZYDUSLIFE.NS"
+# 2. Controls / Strategy Selection
+st.subheader("⚙️ Scanner Settings")
+
+c1, c2, c3 = st.columns(3)
+
+with c1:
+    strategy = st.selectbox(
+        "🎯 Select Condition / Strategy",
+        [
+            "Condition 1: Lower Band Body Cut (Green Candle)",
+            "Condition 2: Completely Below Lower Band (No Touch / Gap)"
         ]
+    )
 
-STOCKS_LIST = fetch_nifty200_stocks()
+with c2:
+    timeframe = st.selectbox(
+        "⏱️ Select Timeframe",
+        ["5m", "15m", "30m", "1h", "2h", "4h", "1d"],
+        index=6
+    )
 
-# 4. Bollinger Band Lower Band Body Cut Logic
-st.subheader("🎯 Bollinger Lower Band Body Cut Stocks")
+with c3:
+    segment = st.radio("📜 Stock List Segment", ["NIFTY 50", "NIFTY 500"], inline=True)
 
-@st.cache_data(ttl=300)
-def scan_bollinger_reversal(stocks):
+# Map selected timeframe to yfinance interval & period
+tf_map = {
+    "5m": ("5m", "5d"),
+    "15m": ("15m", "5d"),
+    "30m": ("30m", "5d"),
+    "1h": ("60m", "1mo"),
+    "2h": ("60m", "1mo"), # Resampled if needed
+    "4h": ("60m", "3mo"), # Resampled if needed
+    "1d": ("1d", "3mo")
+}
+interval, period = tf_map[timeframe]
+
+# Stock Lists
+NIFTY_50 = [
+    "RELIANCE.NS", "TCS.NS", "HDFCBANK.NS", "INFY.NS", "ICICIBANK.NS", "HINDUNILVR.NS", "ITC.NS", "SBIN.NS",
+    "BHARTIARTL.NS", "LTIM.NS", "KOTAKBANK.NS", "LT.NS", "AXISBANK.NS", "HCLTECH.NS", "BAJFINANCE.NS",
+    "ASIANPAINT.NS", "MARUTI.NS", "SUNPHARMA.NS", "TITAN.NS", "ULTRACEMCO.NS", "TATAMOTORS.NS", "NTPC.NS",
+    "ONGC.NS", "POWERGRID.NS", "ADANIENT.NS", "ADANIPORTS.NS", "COALINDIA.NS", "BAJAJFINSV.NS", "TATASTEEL.NS",
+    "M&M.NS", "NESTLEIND.NS", "GRASIM.NS", "TECHM.NS", "HEROMOTOCO.NS", "CIPLA.NS", "WIPRO.NS", "HDFCLIFE.NS",
+    "BPCL.NS", "EICHERMOT.NS", "DRREDDY.NS", "DIVISLAB.NS", "TATACONSUM.NS", "SBILIFE.NS", "BAJAJ-AUTO.NS",
+    "BRITANNIA.NS", "INDUSINDBK.NS", "HINDALCO.NS", "JSWSTEEL.NS", "APOLLOHOSP.NS", "UPL.NS"
+]
+
+@st.cache_data(ttl=86400)
+def fetch_nifty500_stocks():
+    url = "https://raw.githubusercontent.com/indian-stock-market/nifty-csv/main/ind_nifty500list.csv"
+    try:
+        df = pd.read_csv(url)
+        return [f"{s.strip()}.NS" for s in df['Symbol'].dropna().unique()]
+    except Exception:
+        return NIFTY_50
+
+stocks_to_scan = NIFTY_50 if segment == "NIFTY 50" else fetch_nifty500_stocks()
+
+# 3. Scanner Function
+@st.cache_data(ttl=60)
+def scan_bollinger(stocks, interval, period, strategy_type, tf_name):
     selected = []
     if not stocks:
         return selected
 
     try:
-        data = yf.download(stocks, period="30d", interval="1d", group_by='ticker', progress=False)
+        data = yf.download(stocks, period=period, interval=interval, group_by='ticker', progress=False)
     except Exception:
         return selected
-    
+
     for symbol in stocks:
         try:
             if symbol in data:
@@ -193,41 +203,64 @@ def scan_bollinger_reversal(stocks):
 
             if len(df) < 20:
                 continue
-            
-            # Bollinger Bands (20 Period, 2 Std Dev)
+
+            # Resample for 2h and 4h if timeframe is selected
+            if tf_name == "2h":
+                df = df.resample('2h').agg({'Open':'first', 'High':'max', 'Low':'min', 'Close':'last', 'Volume':'sum'}).dropna()
+            elif tf_name == "4h":
+                df = df.resample('4h').agg({'Open':'first', 'High':'max', 'Low':'min', 'Close':'last', 'Volume':'sum'}).dropna()
+
+            if len(df) < 20:
+                continue
+
+            # Calculate Bollinger Bands
             df['SMA20'] = df['Close'].rolling(window=20).mean()
             df['STD20'] = df['Close'].rolling(window=20).std()
             df['Lower_Band'] = df['SMA20'] - (df['STD20'] * 2)
-            
-            today = df.iloc[-1]
-            
-            # 1. Green Candle (Close > Open)
-            is_green = today['Close'] > today['Open']
-            
-            # 2. Open price was BELOW Lower Band
-            open_below_band = today['Open'] < today['Lower_Band']
-            
-            # 3. Close price is ABOVE Lower Band (Body cuts through the band)
-            close_above_band = today['Close'] > today['Lower_Band']
-            
-            if is_green and open_below_band and close_above_band:
-                selected.append({
-                    "Stock": symbol.replace(".NS", ""),
-                    "LTP (₹)": round(today['Close'], 2),
-                    "Open (₹)": round(today['Open'], 2),
-                    "Lower Band (₹)": round(today['Lower_Band'], 2),
-                    "Volume": int(today['Volume'])
-                })
+
+            candle = df.iloc[-1]
+
+            if strategy_type == "Condition 1: Lower Band Body Cut (Green Candle)":
+                is_green = candle['Close'] > candle['Open']
+                open_below = candle['Open'] < candle['Lower_Band']
+                close_above = candle['Close'] > candle['Lower_Band']
+
+                if is_green and open_below and close_above:
+                    selected.append({
+                        "Stock": symbol.replace(".NS", ""),
+                        "LTP (₹)": round(candle['Close'], 2),
+                        "Open (₹)": round(candle['Open'], 2),
+                        "High (₹)": round(candle['High'], 2),
+                        "Lower Band (₹)": round(candle['Lower_Band'], 2),
+                        "Volume": int(candle['Volume'])
+                    })
+
+            elif strategy_type == "Condition 2: Completely Below Lower Band (No Touch / Gap)":
+                # High is strictly less than Lower Band (No touch)
+                completely_below = candle['High'] < candle['Lower_Band']
+
+                if completely_below:
+                    selected.append({
+                        "Stock": symbol.replace(".NS", ""),
+                        "LTP (₹)": round(candle['Close'], 2),
+                        "High (₹)": round(candle['High'], 2),
+                        "Low (₹)": round(candle['Low'], 2),
+                        "Lower Band (₹)": round(candle['Lower_Band'], 2),
+                        "Volume": int(candle['Volume'])
+                    })
         except Exception:
             continue
-            
+
     return selected
 
-with st.spinner("Scanning Stocks..."):
-    results = scan_bollinger_reversal(STOCKS_LIST)
+st.markdown("---")
+
+# 4. Results
+with st.spinner(f"Scanning {len(stocks_to_scan)} stocks in {timeframe} timeframe..."):
+    results = scan_bollinger(stocks_to_scan, interval, period, strategy, timeframe)
 
 if results:
-    st.success(f"Mot {len(results)} ti stock pawa geche jekhane Green Candle Body Bollinger Lower Band-ke majhamaji keteiyeche!")
+    st.success(f"Mot {len(results)} ti stock pawa geche selected condition onujayi ({timeframe} timeframe)!")
     st.dataframe(pd.DataFrame(results), use_container_width=True)
 else:
-    st.info("Ajke kono stock-e Green Candle Body Bollinger Lower Band-ke majhamaji kete beroyni. Market close hoyar por (bikel 5-ta) 'Refresh Data' button-e click korun.")
+    st.info(f" Selected condition-e current live data-te {timeframe} timeframe-e kono stock pawa jayni. Live market-e data auto update hobe.")
