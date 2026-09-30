@@ -20,7 +20,7 @@ if st.button("🔄 Refresh Data / Scan Now"):
 
 st.markdown("---")
 
-# 2. Live Market Indices
+# 2. Live Market Indices (Arranged in 2 Neat Boxes/Rows)
 st.subheader("📊 Live Market Indices")
 
 @st.cache_data(ttl=60)
@@ -55,10 +55,24 @@ def get_live_indices():
     return index_data
 
 indices_info = get_live_indices()
-cols = st.columns(9)
-for idx, name in enumerate(indices_info.keys()):
+idx_keys = list(indices_info.keys())
+
+# Box 1: Prothom 5-ti Indices (Nifty 50, Sensex, Bank Nifty, India VIX, Dow Jones)
+cols_row1 = st.columns(5)
+for i in range(5):
+    name = idx_keys[i]
     d = indices_info[name]
-    with cols[idx]:
+    with cols_row1[i]:
+        st.metric(label=name, value=d["price"], delta=f"{d['change']} ({d['pct']}%)")
+
+st.markdown("<div style='margin-top: 10px;'></div>", unsafe_allow_html=True)
+
+# Box 2: Porer 4-ti Indices (Nasdaq, DAX, Shanghai, Nikkei 225)
+cols_row2 = st.columns(4)
+for i in range(5, 9):
+    name = idx_keys[i]
+    d = indices_info[name]
+    with cols_row2[i - 5]:
         st.metric(label=name, value=d["price"], delta=f"{d['change']} ({d['pct']}%)")
 
 st.markdown("---")
