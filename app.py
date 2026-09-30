@@ -9,6 +9,42 @@ st.set_page_config(page_title="Bollinger Band Stock Scanner", layout="wide")
 IST = pytz.timezone('Asia/Kolkata')
 now_ist = datetime.now(IST)
 
+# Custom CSS for styling small neat boxes
+st.markdown("""
+    <style>
+    .index-box {
+        background-color: #f8f9fa;
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        padding: 10px;
+        text-align: center;
+        margin-bottom: 10px;
+        box-shadow: 0px 2px 4px rgba(0,0,0,0.05);
+    }
+    .index-name {
+        font-size: 13px;
+        font-weight: 600;
+        color: #555555;
+        margin-bottom: 2px;
+    }
+    .index-price {
+        font-size: 16px;
+        font-weight: bold;
+        color: #111111;
+    }
+    .index-change-pos {
+        font-size: 12px;
+        font-weight: bold;
+        color: #0d8351;
+    }
+    .index-change-neg {
+        font-size: 12px;
+        font-weight: bold;
+        color: #e53935;
+    }
+    </style>
+""", unsafe_allow_html=True)
+
 # Top Header
 st.title("📈 Bollinger Band Lower Cut Scanner")
 st.caption(f"📅 **Live Time:** `{now_ist.strftime('%d/%m/%Y | %I:%M:%S %p IST')}`")
@@ -20,7 +56,7 @@ if st.button("🔄 Refresh Data / Scan Now"):
 
 st.markdown("---")
 
-# 2. Live Market Indices (Arranged in 2 Neat Boxes/Rows)
+# 2. Live Market Indices (Styled Small Boxes)
 st.subheader("📊 Live Market Indices")
 
 @st.cache_data(ttl=60)
@@ -57,23 +93,36 @@ def get_live_indices():
 indices_info = get_live_indices()
 idx_keys = list(indices_info.keys())
 
-# Box 1: Prothom 5-ti Indices (Nifty 50, Sensex, Bank Nifty, India VIX, Dow Jones)
+# Helper function to render styled HTML box
+def render_index_card(name, d):
+    is_positive = d["change"] >= 0
+    change_class = "index-change-pos" if is_positive else "index-change-neg"
+    sign = "+" if is_positive else ""
+    
+    html_code = f"""
+    <div class="index-box">
+        <div class="index-name">{name}</div>
+        <div class="index-price">{d['price']:,}</div>
+        <div class="{change_class}">{sign}{d['change']} ({sign}{d['pct']}%)</div>
+    </div>
+    """
+    return html_code
+
+# Row 1: 5 Boxes
 cols_row1 = st.columns(5)
 for i in range(5):
     name = idx_keys[i]
     d = indices_info[name]
     with cols_row1[i]:
-        st.metric(label=name, value=d["price"], delta=f"{d['change']} ({d['pct']}%)")
+        st.markdown(render_index_card(name, d), unsafe_allow_html=True)
 
-st.markdown("<div style='margin-top: 10px;'></div>", unsafe_allow_html=True)
-
-# Box 2: Porer 4-ti Indices (Nasdaq, DAX, Shanghai, Nikkei 225)
+# Row 2: 4 Boxes
 cols_row2 = st.columns(4)
 for i in range(5, 9):
     name = idx_keys[i]
     d = indices_info[name]
     with cols_row2[i - 5]:
-        st.metric(label=name, value=d["price"], delta=f"{d['change']} ({d['pct']}%)")
+        st.markdown(render_index_card(name, d), unsafe_allow_html=True)
 
 st.markdown("---")
 
