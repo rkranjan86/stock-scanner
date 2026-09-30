@@ -10,7 +10,7 @@ IST = pytz.timezone('Asia/Kolkata')
 now_ist = datetime.now(IST)
 
 # Top Header
-st.title("📈 Bollinger Band Reversal Scanner")
+st.title("📈 Bollinger Band Lower Cut Scanner")
 st.caption(f"📅 **Live Time:** `{now_ist.strftime('%d/%m/%Y | %I:%M:%S %p IST')}`")
 
 # 1. Refresh Button
@@ -106,8 +106,8 @@ def fetch_nifty200_stocks():
 
 STOCKS_LIST = fetch_nifty200_stocks()
 
-# 4. Bollinger Band Lower Band Bounce Scanner Logic
-st.subheader("🎯 Bollinger Lower Band Reversal Stocks (Green Candle Cut/Bounce)")
+# 4. Bollinger Band Lower Band Body Cut Logic
+st.subheader("🎯 Bollinger Lower Band Body Cut Stocks")
 
 @st.cache_data(ttl=300)
 def scan_bollinger_reversal(stocks):
@@ -116,7 +116,6 @@ def scan_bollinger_reversal(stocks):
         return selected
 
     try:
-        # Download last 30 days data to calculate 20 SMA
         data = yf.download(stocks, period="30d", interval="1d", group_by='ticker', progress=False)
     except Exception:
         return selected
@@ -131,28 +130,27 @@ def scan_bollinger_reversal(stocks):
             if len(df) < 20:
                 continue
             
-            # Calculate Bollinger Bands (20 Period, 2 Std Dev)
+            # Bollinger Bands (20 Period, 2 Std Dev)
             df['SMA20'] = df['Close'].rolling(window=20).mean()
             df['STD20'] = df['Close'].rolling(window=20).std()
             df['Lower_Band'] = df['SMA20'] - (df['STD20'] * 2)
             
             today = df.iloc[-1]
             
-            # Rule 1: Today candle is Green (Close > Open)
+            # 1. Green Candle (Close > Open)
             is_green = today['Close'] > today['Open']
             
-            # Rule 2: Today Low price cut or touched below Lower Band
-            touched_lower_band = today['Low'] <= today['Lower_Band']
+            # 2. Open price was BELOW Lower Band
+            open_below_band = today['Open'] < today['Lower_Band']
             
-            # Rule 3: Today Close price closed above Lower Band (Bounced Back)
-            closed_above_lower_band = today['Close'] > today['Lower_Band']
+            # 3. Close price is ABOVE Lower Band (Body cuts through the band)
+            close_above_band = today['Close'] > today['Lower_Band']
             
-            if is_green and touched_lower_band and closed_above_lower_band:
+            if is_green and open_below_band and close_above_band:
                 selected.append({
                     "Stock": symbol.replace(".NS", ""),
                     "LTP (₹)": round(today['Close'], 2),
                     "Open (₹)": round(today['Open'], 2),
-                    "Low (₹)": round(today['Low'], 2),
                     "Lower Band (₹)": round(today['Lower_Band'], 2),
                     "Volume": int(today['Volume'])
                 })
@@ -161,11 +159,11 @@ def scan_bollinger_reversal(stocks):
             
     return selected
 
-with st.spinner("Scanning Bollinger Lower Band Reversals..."):
+with st.spinner("Scanning Stocks..."):
     results = scan_bollinger_reversal(STOCKS_LIST)
 
 if results:
-    st.success(f"Mot {len(results)} ti stock pawa geche jaha Bollinger Lower Band theke Green Candle diye bounce koreche!")
+    st.success(f"Mot {len(results)} ti stock pawa geche jekhane Green Candle Body Bollinger Lower Band-ke majhamaji keteiyeche!")
     st.dataframe(pd.DataFrame(results), use_container_width=True)
 else:
-    st.info("Ajke kono stock Bollinger Lower Band-ke Green Candle diye cut/bounce korini. Market close hoyar por (bikel 5-ta) 'Refresh Data' button-e click korun.")
+    st.info("Ajke kono stock-e Green Candle Body Bollinger Lower Band-ke majhamaji kete beroyni. Market close hoyar por (bikel 5-ta) 'Refresh Data' button-e click korun.")
