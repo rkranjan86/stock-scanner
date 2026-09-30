@@ -1,23 +1,31 @@
 import streamlit as st
 import yfinance as yf
 import pandas as pd
-from datetime import datetime, time
+from datetime import datetime
 import pytz
 
 # Page configuration
-st.set_page_config(page_title="EOD Stock Analysis Dashboard", layout="wide")
+st.set_page_config(page_title="Stock Scanner Dashboard", layout="wide")
 
 # Timezone set (IST)
 IST = pytz.timezone('Asia/Kolkata')
 now_ist = datetime.now(IST)
 
-# Header Section: Live Date & Time
-st.markdown(f"### 📅 **Live Date & Time:** `{now_ist.strftime('%d/%m/%Y | %I:%M:%S %p IST')}`")
+# Main Title & Subtitle
+st.title("📈 Daily Stock Breakout Dashboard")
+st.caption(f"📅 **Live Date & Time:** `{now_ist.strftime('%d/%m/%Y | %I:%M:%S %p IST')}`")
 
-# 1. Live Index Tracker (Nifty 50, Sensex, Bank Nifty)
+# 1. Refresh Button Section
+if st.button("🔄 Refresh Data / Scan Now"):
+    st.cache_data.clear()
+    st.rerun()
+
+st.markdown("---")
+
+# 2. Live Market Indices Section
 st.subheader("📊 Live Market Indices")
 
-@st.cache_data(ttl=60) # Live Indices update every 60s
+@st.cache_data(ttl=60)
 def get_live_indices():
     indices = {
         "Nifty 50": "^NSEI",
@@ -59,24 +67,32 @@ with col3:
 
 st.markdown("---")
 
-# 2. Hardcoded Nifty 200 / Major Stocks List (To prevent fetch errors)
-STOCKS_LIST = [
-    "RELIANCE.NS", "TCS.NS", "HDFCBANK.NS", "INFY.NS", "ICICIBANK.NS", "HINDUNILVR.NS",
-    "ITC.NS", "SBIN.NS", "BHARTIARTL.NS", "LTIM.NS", "KOTAKBANK.NS", "LT.NS",
-    "AXISBANK.NS", "ASIANPAINT.NS", "MARUTI.NS", "TITAN.NS", "SUNPHARMA.NS", "BAJFINANCE.NS",
-    "TATAMOTORS.NS", "TATASTEEL.NS", "NTPC.NS", "POWERGRID.NS", "M&M.NS", "ULTRACEMCO.NS",
-    "ADANIENT.NS", "ADANIPORTS.NS", "COALINDIA.NS", "HCLTECH.NS", "ONGC.NS", "WIPRO.NS",
-    "BPCL.NS", "IOC.NS", "DLF.NS", "HAL.NS", "BEL.NS", "TATAPOWER.NS", "VBL.NS", "ZOMATO.NS",
-    "JIOFIN.NS", "PFC.NS", "RECLTD.NS", "IRFC.NS", "SUZLON.NS", "BHEL.NS", "BANKBARODA.NS"
-]
+# 3. Stock List (Fallback to reliable list if external URL fails)
+@st.cache_data(ttl=3600)
+def get_stock_list():
+    url = "https://raw.githubusercontent.com/indian-stock-market/nifty-csv/main/ind_nifty200list.csv"
+    try:
+        df = pd.read_csv(url)
+        return [f"{symbol}.NS" for symbol in df['Symbol']]
+    except Exception:
+        # Static Nifty 200 list fallback
+        return [
+            "RELIANCE.NS", "TCS.NS", "HDFCBANK.NS", "INFY.NS", "ICICIBANK.NS", "HINDUNILVR.NS",
+            "ITC.NS", "SBIN.NS", "BHARTIARTL.NS", "LTIM.NS", "KOTAKBANK.NS", "LT.NS",
+            "AXISBANK.NS", "ASIANPAINT.NS", "MARUTI.NS", "TITAN.NS", "SUNPHARMA.NS", "BAJFINANCE.NS",
+            "TATAMOTORS.NS", "TATASTEEL.NS", "NTPC.NS", "POWERGRID.NS", "M&M.NS", "ULTRACEMCO.NS",
+            "ADANIENT.NS", "ADANIPORTS.NS", "COALINDIA.NS", "HCLTECH.NS", "ONGC.NS", "WIPRO.NS",
+            "BPCL.NS", "IOC.NS", "DLF.NS", "HAL.NS", "BEL.NS", "TATAPOWER.NS", "VBL.NS", "ZOMATO.NS"
+        ]
 
-# 3. Stock Scanner Logic
-st.subheader("🎯 EOD Breakout Stock Analysis (Filter: Close >= Open + 10)")
+STOCKS_LIST = get_stock_list()
 
-@st.cache_data(ttl=1800) # Data cached for 30 mins
+# 4. Stock Scanner Logic
+st.subheader("🎯 EOD Breakout Stocks (Close >= Open + ₹10 & Breakout Rules)")
+
+@st.cache_data(ttl=300)
 def scan_eod_breakouts():
     selected = []
-    # Fetch 5 days daily candles
     data = yf.download(STOCKS_LIST, period="5d", interval="1d", group_by='ticker', progress=False)
     
     for symbol in STOCKS_LIST:
@@ -88,24 +104,17 @@ def scan_eod_breakouts():
             today = df.iloc[-1]
             yesterday = df.iloc[-2]
             
-            # Formulate Rules
-            # Rule 1: Green Candle (Today Close > Today Open)
+            # Conditions
             is_green = today['Close'] > today['Open']
-            
-            # Rule 2: Minimum 10 Taka Movement (Close - Open >= 10)
             price_gain = today['Close'] - today['Open']
             is_10_taka_up = price_gain >= 10
-            
-            # Rule 3: Today Close > Yesterday High
             break_prev_high = today['Close'] > yesterday['High']
-            
-            # Rule 4: Today Volume > Yesterday Volume
             volume_up = today['Volume'] > yesterday['Volume']
             
             if is_green and is_10_taka_up and break_prev_high and volume_up:
                 selected.append({
                     "Stock": symbol.replace(".NS", ""),
-                    "Close Price (₹)": round(today['Close'], 2),
+                    "LTP (₹)": round(today['Close'], 2),
                     "Price Gain (₹)": round(price_gain, 2),
                     "Yesterday High (₹)": round(yesterday['High'], 2),
                     "Volume": int(today['Volume'])
@@ -115,13 +124,12 @@ def scan_eod_breakouts():
             
     return selected
 
-# Trigger Scan & Display Data
-with st.spinner("Processing Market EOD Data..."):
+# Trigger Scan
+with st.spinner("Scanning Stocks..."):
     results = scan_eod_breakouts()
 
 if results:
-    st.success(f"Mot {len(results)} ti Stock eey Formula-y Select Hoyeche:")
-    res_df = pd.DataFrame(results)
-    st.dataframe(res_df, use_container_width=True)
+    st.success(f"Mot {len(results)} ti stock pawa geche!")
+    st.dataframe(pd.DataFrame(results), use_container_width=True)
 else:
-    st.info("Shesher Market Data Anushare Ei Formula-y Kono Stock Meleni.")
+    st.info("Ajke ei formula-y kono stock meleni. 'Refresh Data' button-e click kore abar check korun.")
