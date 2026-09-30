@@ -125,7 +125,7 @@ for i in range(5, 10):
 st.markdown("---")
 
 # 2. Controls / Strategy Selection
-st.subheader("⚙️ Scanner Settings")
+st.subheader("⚙️️ Scanner Settings")
 
 c1, c2, c3 = st.columns(3)
 
@@ -146,7 +146,8 @@ with c2:
     )
 
 with c3:
-    segment = st.radio("📜 Stock List Segment", ["NIFTY 50", "NIFTY 500"], inline=True)
+    # inline=True er jaygay horizontal=True bebohar kora hoyeche
+    segment = st.radio("📜 Stock List Segment", ["NIFTY 50", "NIFTY 500"], horizontal=True)
 
 # Map selected timeframe to yfinance interval & period
 tf_map = {
@@ -154,8 +155,8 @@ tf_map = {
     "15m": ("15m", "5d"),
     "30m": ("30m", "5d"),
     "1h": ("60m", "1mo"),
-    "2h": ("60m", "1mo"), # Resampled if needed
-    "4h": ("60m", "3mo"), # Resampled if needed
+    "2h": ("60m", "1mo"),
+    "4h": ("60m", "3mo"),
     "1d": ("1d", "3mo")
 }
 interval, period = tf_map[timeframe]
@@ -263,4 +264,4 @@ if results:
     st.success(f"Mot {len(results)} ti stock pawa geche selected condition onujayi ({timeframe} timeframe)!")
     st.dataframe(pd.DataFrame(results), use_container_width=True)
 else:
-    st.info(f" Selected condition-e current live data-te {timeframe} timeframe-e kono stock pawa jayni. Live market-e data auto update hobe.")
+    st.info(f"Selected condition-e current live data-te {timeframe} timeframe-e kono stock pawa jayni. Live market-e data auto update hobe.")
