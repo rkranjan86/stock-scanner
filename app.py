@@ -63,6 +63,7 @@ st.subheader("📊 Live Market Indices")
 def get_live_indices():
     indices = {
         "NIFTY 50": "^NSEI",
+        "NIFTY 500": "^CRSLDX",
         "SENSEX": "^BSESN",
         "BANK NIFTY": "^NSEBANK",
         "INDIA VIX": "^INDIAVIX",
