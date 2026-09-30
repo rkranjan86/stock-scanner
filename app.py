@@ -11,26 +11,41 @@ st.set_page_config(page_title="Stock Scanner Dashboard", layout="wide")
 IST = pytz.timezone('Asia/Kolkata')
 now_ist = datetime.now(IST)
 
-# Main Title & Subtitle
-st.title("📈 Daily Stock Breakout Dashboard")
-st.caption(f"📅 **Live Date & Time:** `{now_ist.strftime('%d/%m/%Y | %I:%M:%S %p IST')}`")
+# Compact Top Header
+st.markdown(
+    f"""
+    <div style='margin-top:-50px; margin-bottom:10px;'>
+        <h2 style='display:inline;'>📈 Daily Stock Breakout Dashboard</h2>
+        <span style='float:right; font-size:14px; color:gray; padding-top:10px;'>
+            📅 <b>Live Time:</b> {now_ist.strftime('%d/%m/%Y | %I:%M:%S %p IST')}
+        </span>
+    </div>
+    """, 
+    unsafe_allow_html=True
+)
 
 # 1. Refresh Button Section
 if st.button("🔄 Refresh Data / Scan Now"):
     st.cache_data.clear()
     st.rerun()
 
-st.markdown("---")
+st.markdown("<hr style='margin:10px 0;'>", unsafe_allow_html=True)
 
-# 2. Live Market Indices Section
-st.subheader("📊 Live Market Indices")
+# 2. Live Market Indices (Compact Cards)
+st.markdown("##### 📊 Live Market Indices (National & Global)")
 
 @st.cache_data(ttl=60)
 def get_live_indices():
     indices = {
-        "Nifty 50": "^NSEI",
-        "Sensex": "^BSESN",
-        "Bank Nifty": "^NSEBANK"
+        "NIFTY 50": "^NSEI",
+        "SENSEX": "^BSESN",
+        "BANK NIFTY": "^NSEBANK",
+        "INDIA VIX": "^INDIAVIX",
+        "DOW JONES": "^DJI",
+        "NASDAQ": "^IXIC",
+        "DAX": "^GDAXI",
+        "SHANGHAI": "000001.SS",
+        "NIKKEI 225": "^N225"
     }
     index_data = {}
     for name, ticker in indices.items():
@@ -51,21 +66,17 @@ def get_live_indices():
     return index_data
 
 indices_info = get_live_indices()
-col1, col2, col3 = st.columns(3)
 
-with col1:
-    d = indices_info["Nifty 50"]
-    st.metric(label="NIFTY 50", value=d["price"], delta=f"{d['change']} ({d['pct']}%)")
+# Grid layout: 3 rows x 3 columns for 9 indices to save space
+cols = st.columns(3)
+idx_names = list(indices_info.keys())
 
-with col2:
-    d = indices_info["Sensex"]
-    st.metric(label="SENSEX", value=d["price"], delta=f"{d['change']} ({d['pct']}%)")
+for idx, name in enumerate(idx_names):
+    d = indices_info[name]
+    with cols[idx % 3]:
+        st.metric(label=name, value=d["price"], delta=f"{d['change']} ({d['pct']}%)")
 
-with col3:
-    d = indices_info["Bank Nifty"]
-    st.metric(label="BANK NIFTY", value=d["price"], delta=f"{d['change']} ({d['pct']}%)")
-
-st.markdown("---")
+st.markdown("<hr style='margin:10px 0;'>", unsafe_allow_html=True)
 
 # 3. Stock List (Fallback to reliable list if external URL fails)
 @st.cache_data(ttl=3600)
@@ -75,7 +86,6 @@ def get_stock_list():
         df = pd.read_csv(url)
         return [f"{symbol}.NS" for symbol in df['Symbol']]
     except Exception:
-        # Static Nifty 200 list fallback
         return [
             "RELIANCE.NS", "TCS.NS", "HDFCBANK.NS", "INFY.NS", "ICICIBANK.NS", "HINDUNILVR.NS",
             "ITC.NS", "SBIN.NS", "BHARTIARTL.NS", "LTIM.NS", "KOTAKBANK.NS", "LT.NS",
@@ -88,7 +98,7 @@ def get_stock_list():
 STOCKS_LIST = get_stock_list()
 
 # 4. Stock Scanner Logic
-st.subheader("🎯 EOD Breakout Stocks (Close >= Open + ₹10 & Breakout Rules)")
+st.markdown("##### 🎯 EOD Breakout Stocks (Close >= Open + ₹10 & Breakout Rules)")
 
 @st.cache_data(ttl=300)
 def scan_eod_breakouts():
@@ -132,4 +142,4 @@ if results:
     st.success(f"Mot {len(results)} ti stock pawa geche!")
     st.dataframe(pd.DataFrame(results), use_container_width=True)
 else:
-    st.info("Ajke ei formula-y kono stock meleni. 'Refresh Data' button-e click kore abar check korun.")
+    st.info("Ajke ei formula-y kono stock meleni. Market close hoyar por (bikel 5-ta) 'Refresh Data' button-e click kore check korun.")
