@@ -20,7 +20,7 @@ if st.button("🔄 Refresh Data / Scan Now"):
 
 st.markdown("---")
 
-# 2. Live Market Indices (1 Single Line Display)
+# 2. Live Market Indices
 st.subheader("📊 Live Market Indices")
 
 @st.cache_data(ttl=60)
@@ -63,50 +63,41 @@ for idx, name in enumerate(indices_info.keys()):
 
 st.markdown("---")
 
-# 3. Full Nifty 200 Dynamic List
-STOCKS_LIST = [
-    "ABB.NS", "ACC.NS", "AAVAS.NS", "ABBOTINDIA.NS", "ABCAPITAL.NS", "ABFRL.NS", "ADANIENSOL.NS", 
-    "ADANIENT.NS", "ADANIGREEN.NS", "ADANIPORTS.NS", "ADANIPOWER.NS", "ATGL.NS", "AWL.NS", "APLAPOLLO.NS", 
-    "ALKEM.NS", "AMBUJACEM.NS", "ANGELONE.NS", "APOLLOHOSP.NS", "APOLLOTYRE.NS", "ASHOKLEY.NS", 
-    "ASIANPAINT.NS", "ASTRAL.NS", "ATUL.NS", "AUROPHARMA.NS", "AUBANK.NS", "AXISBANK.NS", "BAJAJ-AUTO.NS", 
-    "BAJAJFINSV.NS", "BAJFINANCE.NS", "BALKRISIND.NS", "BANDHANBNK.NS", "BANKBARODA.NS", "BANKINDIA.NS", 
-    "BATAINDIA.NS", "BERGEPAINT.NS", "BEL.NS", "BHARATFORG.NS", "BHEL.NS", "BPCL.NS", "BHARTIARTL.NS", 
-    "BIOCON.NS", "BSOFT.NS", "BOSCHLTD.NS", "BPCL.NS", "BRITANNIA.NS", "CANBK.NS", "CGPOWER.NS", 
-    "CHAMBLFERT.NS", "CHOLAFIN.NS", "CIPLA.NS", "COALINDIA.NS", "COFORGE.NS", "COLPAL.NS", "CONCOR.NS", 
-    "COROMANDEL.NS", "CROMPTON.NS", "CUMMINSIND.NS", "DABUR.NS", "DALBHARAT.NS", "DEEPAKNTR.NS", 
-    "DELHIVERY.NS", "DIVISLAB.NS", "DIXON.NS", "DLF.NS", "LALPATHLAB.NS", "DRREDDY.NS", "EICHERMOT.NS", 
-    "ESCORTS.NS", "EXIDEIND.NS", "FEDERALBNK.NS", "FACT.NS", "GAIL.NS", "GLENMARK.NS", "GMRAIRPORT.NS", 
-    "GODREJCP.NS", "GODREJPROP.NS", "GRASIM.NS", "GUJGASLTD.NS", "HAL.NS", "HAVELLS.NS", "HCLTECH.NS", 
-    "HDFCAMC.NS", "HDFCBANK.NS", "HDFCLIFE.NS", "HEROMOTOCO.NS", "HINDALCO.NS", "HAL.NS", "HINDCOPPER.NS", 
-    "HINDPETRO.NS", "HINDUNILVR.NS", "ICICIBANK.NS", "ICICIGI.NS", "ICICIPRULI.NS", "IDFCFIRSTB.NS", 
-    "INDIANB.NS", "INDIGO.NS", "INDUSINDBK.NS", "INDUSTOWER.NS", "INFY.NS", "IOC.NS", "IRCTC.NS", 
-    "IRFC.NS", "IREDA.NS", "IGL.NS", "INDUSTOWER.NS", "NAUKRI.NS", "INFY.NS", "INOXWIND.NS", "ITC.NS", 
-    "JINDALSTEL.NS", "JIOFIN.NS", "JSWENERGY.NS", "JSWSTEEL.NS", "JUBLFOOD.NS", "KALYANKJIL.NS", 
-    "KEI.NS", "KOTAKBANK.NS", "KPITTECH.NS", "LTF.NS", "LTTS.NS", "LICHSGFIN.NS", "LICI.NS", "LTIM.NS", 
-    "LT.NS", "LUPIN.NS", "M&M.NS", "M&MFIN.NS", "MARICO.NS", "MARUTI.NS", "MAXHEALTH.NS", "MAZDOCK.NS", 
-    "METROPOLIS.NS", "MFSL.NS", "MGL.NS", "MSUMI.NS", "MPHASIS.NS", "MRF.NS", "NATIONALUM.NS", 
-    "NAVINFLUOR.NS", "NESTLEIND.NS", "NHPC.NS", "NMDC.NS", "NTPC.NS", "NYKAA.NS", "OBEROIRLTY.NS", 
-    "ONGC.NS", "OIL.NS", "PAYTM.NS", "OFSS.NS", "POLICYBZR.NS", "PIIND.NS", "PAGEIND.NS", "PERSISTENT.NS", 
-    "PETRONET.NS", "PFC.NS", "PIDILITIND.NS", "PNB.NS", "POLYCAB.NS", "POONAWALLA.NS", "POWERGRID.NS", 
-    "PRESTAGE.NS", "PVRINOX.NS", "RAMCOCEM.NS", "RCF.NS", "RECLTD.NS", "RELIANCE.NS", "RVNL.NS", 
-    "SAIL.NS", "SBICARD.NS", "SBILIFE.NS", "SBIN.NS", "SHREECEM.NS", "SHRIRAMFIN.NS", "SIEMENS.NS", 
-    "SJVN.NS", "SONACOMS.NS", "SRF.NS", "SUNPHARMA.NS", "SUNTV.NS", "SUZLON.NS", "SYNGENE.NS", 
-    "TATACOMM.NS", "TATACONSUM.NS", "TATAELXSI.NS", "TATAMTRDVR.NS", "TATAMOTORS.NS", "TATAPOWER.NS", 
-    "TATASTEEL.NS", "TATATECH.NS", "TCS.NS", "TECHM.NS", "TITAN.NS", "TORNTPHARM.NS", "TORNTPOWER.NS", 
-    "TRENT.NS", "TVSMOTOR.NS", "ULTRACEMCO.NS", "UNIONBANK.NS", "UPL.NS", "VBL.NS", "VEDL.NS", 
-    "IDEA.NS", "VOLTAS.NS", "WIPRO.NS", "YESBANK.NS", "ZEEL.NS", "ZOMATO.NS", "ZYDUSLIFE.NS"
-]
+# 3. Fully Automatic Stock List Fetcher (No manual list)
+@st.cache_data(ttl=86400) # Auto refresh stock list once a day
+def fetch_automatic_nifty200():
+    # Source 1: NSE official CSV repository
+    url_primary = "https://raw.githubusercontent.com/indian-stock-market/nifty-csv/main/ind_nifty200list.csv"
+    # Source 2: Backup Nifty 200 repository
+    url_backup = "https://raw.githubusercontent.com/anandac/nifty200-stocks/main/nifty200.csv"
+    
+    try:
+        df = pd.read_csv(url_primary)
+        symbols = [f"{symbol.strip()}.NS" for symbol in df['Symbol']]
+        return symbols
+    except Exception:
+        try:
+            df = pd.read_csv(url_backup)
+            symbols = [f"{symbol.strip()}.NS" for symbol in df['Symbol']]
+            return symbols
+        except Exception:
+            st.error("Stock list auto-fetch korte somossa hoyeche. Kichu khon por Refresh korun.")
+            return []
+
+STOCKS_LIST = fetch_automatic_nifty200()
 
 # 4. Stock Scanner Logic (Exact 4 Rules)
-st.subheader("🎯 EOD Breakout Stocks (All 4 Formula Rules Applied)")
+st.subheader(f"🎯 EOD Breakout Stocks (Auto-fetched {len(STOCKS_LIST)} Stocks)")
 
 @st.cache_data(ttl=300)
-def scan_eod_breakouts():
+def scan_eod_breakouts(stocks):
     selected = []
-    # Download 5 days data for Nifty 200
-    data = yf.download(STOCKS_LIST, period="5d", interval="1d", group_by='ticker', progress=False)
+    if not stocks:
+        return selected
+
+    data = yf.download(stocks, period="5d", interval="1d", group_by='ticker', progress=False)
     
-    for symbol in STOCKS_LIST:
+    for symbol in stocks:
         try:
             df = data[symbol].dropna()
             if len(df) < 2:
@@ -115,20 +106,19 @@ def scan_eod_breakouts():
             today = df.iloc[-1]
             yesterday = df.iloc[-2]
             
-            # 1. Green Candle (Close > Open)
+            # Rule 1: Green Candle
             is_green = today['Close'] > today['Open']
             
-            # 2. Minimum 10 Taka Gain (Close - Open >= 10)
+            # Rule 2: Minimum ₹10 Gain
             price_gain = today['Close'] - today['Open']
             is_10_taka_up = price_gain >= 10
             
-            # 3. Today Close > Yesterday High
+            # Rule 3: Today Close > Yesterday High
             break_prev_high = today['Close'] > yesterday['High']
             
-            # 4. Today Volume > Yesterday Volume
+            # Rule 4: Today Volume > Yesterday Volume
             volume_up = today['Volume'] > yesterday['Volume']
             
-            # All 4 conditions match
             if is_green and is_10_taka_up and break_prev_high and volume_up:
                 selected.append({
                     "Stock": symbol.replace(".NS", ""),
@@ -143,11 +133,11 @@ def scan_eod_breakouts():
             
     return selected
 
-with st.spinner("Scanning 200 Stocks..."):
-    results = scan_eod_breakouts()
+with st.spinner("Auto-scanning Nifty 200 Stocks..."):
+    results = scan_eod_breakouts(STOCKS_LIST)
 
 if results:
     st.success(f"Mot {len(results)} ti stock pawa geche!")
     st.dataframe(pd.DataFrame(results), use_container_width=True)
 else:
-    st.info("Ajke ei formula-y kono stock meleni. Market close hoyar por 'Refresh Data' button-e click korun.")
+    st.info("Ajke ei formula-y kono stock meleni. Market close hoyar por (bikel 5-ta) 'Refresh Data' button-e click korun.")
