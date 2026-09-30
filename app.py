@@ -4,13 +4,13 @@ import pandas as pd
 from datetime import datetime
 import pytz
 
-st.set_page_config(page_title="Stock Scanner Dashboard", layout="wide")
+st.set_page_config(page_title="Bollinger Band Stock Scanner", layout="wide")
 
 IST = pytz.timezone('Asia/Kolkata')
 now_ist = datetime.now(IST)
 
 # Top Header
-st.title("📈 Daily Stock Breakout Dashboard")
+st.title("📈 Bollinger Band Reversal Scanner")
 st.caption(f"📅 **Live Time:** `{now_ist.strftime('%d/%m/%Y | %I:%M:%S %p IST')}`")
 
 # 1. Refresh Button
@@ -71,7 +71,6 @@ def fetch_nifty200_stocks():
         df = pd.read_csv(url_primary)
         return [f"{symbol.strip()}.NS" for symbol in df['Symbol']]
     except Exception:
-        # Reliable Backup Nifty 200 List
         return [
             "ABB.NS", "ACC.NS", "AAVAS.NS", "ABBOTINDIA.NS", "ABCAPITAL.NS", "ABFRL.NS", "ADANIENSOL.NS", 
             "ADANIENT.NS", "ADANIGREEN.NS", "ADANIPORTS.NS", "ADANIPOWER.NS", "ATGL.NS", "AWL.NS", "APLAPOLLO.NS", 
@@ -107,17 +106,18 @@ def fetch_nifty200_stocks():
 
 STOCKS_LIST = fetch_nifty200_stocks()
 
-# 4. Stock Scanner Logic
-st.subheader(f"🎯 EOD Breakout Stocks (Scanning {len(STOCKS_LIST)} Stocks)")
+# 4. Bollinger Band Lower Band Bounce Scanner Logic
+st.subheader("🎯 Bollinger Lower Band Reversal Stocks (Green Candle Cut/Bounce)")
 
 @st.cache_data(ttl=300)
-def scan_eod_breakouts(stocks):
+def scan_bollinger_reversal(stocks):
     selected = []
     if not stocks:
         return selected
 
     try:
-        data = yf.download(stocks, period="5d", interval="1d", group_by='ticker', progress=False)
+        # Download last 30 days data to calculate 20 SMA
+        data = yf.download(stocks, period="30d", interval="1d", group_by='ticker', progress=False)
     except Exception:
         return selected
     
@@ -128,44 +128,44 @@ def scan_eod_breakouts(stocks):
             else:
                 continue
 
-            if len(df) < 2:
+            if len(df) < 20:
                 continue
             
-            today = df.iloc[-1]
-            yesterday = df.iloc[-2]
+            # Calculate Bollinger Bands (20 Period, 2 Std Dev)
+            df['SMA20'] = df['Close'].rolling(window=20).mean()
+            df['STD20'] = df['Close'].rolling(window=20).std()
+            df['Lower_Band'] = df['SMA20'] - (df['STD20'] * 2)
             
-            # 1. Green Candle
+            today = df.iloc[-1]
+            
+            # Rule 1: Today candle is Green (Close > Open)
             is_green = today['Close'] > today['Open']
             
-            # 2. Minimum ₹10 Gain
-            price_gain = today['Close'] - today['Open']
-            is_10_taka_up = price_gain >= 10
+            # Rule 2: Today Low price cut or touched below Lower Band
+            touched_lower_band = today['Low'] <= today['Lower_Band']
             
-            # 3. Today Close > Yesterday High
-            break_prev_high = today['Close'] > yesterday['High']
+            # Rule 3: Today Close price closed above Lower Band (Bounced Back)
+            closed_above_lower_band = today['Close'] > today['Lower_Band']
             
-            # 4. Today Volume > Yesterday Volume
-            volume_up = today['Volume'] > yesterday['Volume']
-            
-            if is_green and is_10_taka_up and break_prev_high and volume_up:
+            if is_green and touched_lower_band and closed_above_lower_band:
                 selected.append({
                     "Stock": symbol.replace(".NS", ""),
                     "LTP (₹)": round(today['Close'], 2),
-                    "Price Gain (₹)": round(price_gain, 2),
-                    "Yesterday High (₹)": round(yesterday['High'], 2),
-                    "Today Volume": int(today['Volume']),
-                    "Yesterday Volume": int(yesterday['Volume'])
+                    "Open (₹)": round(today['Open'], 2),
+                    "Low (₹)": round(today['Low'], 2),
+                    "Lower Band (₹)": round(today['Lower_Band'], 2),
+                    "Volume": int(today['Volume'])
                 })
         except Exception:
             continue
             
     return selected
 
-with st.spinner("Scanning Nifty 200 Stocks..."):
-    results = scan_eod_breakouts(STOCKS_LIST)
+with st.spinner("Scanning Bollinger Lower Band Reversals..."):
+    results = scan_bollinger_reversal(STOCKS_LIST)
 
 if results:
-    st.success(f"Mot {len(results)} ti stock pawa geche!")
+    st.success(f"Mot {len(results)} ti stock pawa geche jaha Bollinger Lower Band theke Green Candle diye bounce koreche!")
     st.dataframe(pd.DataFrame(results), use_container_width=True)
 else:
-    st.info("Ajke ei 4-ti formula-y kono stock meleni. Market close hoyar por 'Refresh Data' button-e click korun.")
+    st.info("Ajke kono stock Bollinger Lower Band-ke Green Candle diye cut/bounce korini. Market close hoyar por (bikel 5-ta) 'Refresh Data' button-e click korun.")
