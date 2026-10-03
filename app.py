@@ -1,4 +1,5 @@
 import streamlit as st
+import streamlit.components.v1 as components
 import yfinance as yf
 import pandas as pd
 from datetime import datetime
@@ -10,7 +11,7 @@ st.set_page_config(page_title="Stockview12 - Bollinger Band Live Scanner", layou
 IST = pytz.timezone('Asia/Kolkata')
 now_ist = datetime.now(IST)
 
-# Custom Styling (Stockview12 Logo, Marquee, Buttons, Disclaimer)
+# Custom Styling (Stockview12 Logo, Buttons, Disclaimer)
 st.markdown("""
     <style>
     /* Stockview12 Logo Styling */
@@ -40,35 +41,7 @@ st.markdown("""
         color: #111111;
         margin: 0;
     }
-    
-    /* Marquee Ticker Styling */
-    .marquee-wrapper {
-        background-color: #1a1e24;
-        color: #ffffff;
-        padding: 8px 0;
-        border-radius: 6px;
-        overflow: hidden;
-        white-space: nowrap;
-        box-shadow: inset 0 0 5px rgba(0,0,0,0.5);
-        margin-bottom: 20px;
-    }
-    .marquee-content {
-        display: inline-block;
-        animation: marquee 30s linear infinite;
-    }
-    @keyframes marquee {
-        0% { transform: translateX(100%); }
-        100% { transform: translateX(-100%); }
-    }
-    .ticker-item {
-        display: inline-block;
-        margin-right: 35px;
-        font-size: 14px;
-        font-weight: 600;
-    }
-    .ticker-pos { color: #00e676; }
-    .ticker-neg { color: #ff5252; }
-    
+
     /* Disclaimer Box */
     .disclaimer-box {
         background-color: #fff3cd;
@@ -92,9 +65,9 @@ st.markdown(f"""
     </div>
 """, unsafe_allow_html=True)
 
-# 2. Live Indices Fetching for Marquee
+# 2. Live Indices Fetching & Clean Marquee Rendering
 @st.cache_data(ttl=30)
-def get_live_indices():
+def render_live_marquee():
     indices = {
         "NIFTY 50": "^NSEI",
         "SENSEX": "^BSESN",
@@ -116,30 +89,66 @@ def get_live_indices():
             pct_change = (change / prev_close) * 100
             
             is_pos = change >= 0
-            cls = "ticker-pos" if is_pos else "ticker-neg"
+            color = "#00e676" if is_pos else "#ff5252"
             sign = "+" if is_pos else ""
             
             items_html += f"""
-            <div class="ticker-item">
-                <span>{name}:</span> <b>{current_price:,.2f}</b> 
-                <span class="{cls}">({sign}{change:.2f} | {sign}{pct_change:.2f}%)</span>
-            </div>
+            <span style="display: inline-block; margin-right: 40px; font-weight: 600;">
+                <span style="color: #cccccc;">{name}:</span> 
+                <span style="color: #ffffff;">{current_price:,.2f}</span> 
+                <span style="color: {color};">({sign}{change:.2f} | {sign}{pct_change:.2f}%)</span>
+            </span>
             """
         except Exception:
             continue
-    return items_html
 
-marquee_html = get_live_indices()
-
-# Display Marquee Bar
-if marquee_html:
-    st.markdown(f"""
+    html_code = f"""
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <style>
+            body {{
+                margin: 0;
+                padding: 0;
+                background-color: transparent;
+                font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+                font-size: 14px;
+            }}
+            .marquee-wrapper {{
+                background-color: #1a1e24;
+                color: #ffffff;
+                padding: 10px 0;
+                border-radius: 6px;
+                overflow: hidden;
+                white-space: nowrap;
+            }}
+            .marquee-content {{
+                display: inline-block;
+                white-space: nowrap;
+                animation: marquee 35s linear infinite;
+            }}
+            .marquee-content:hover {{
+                animation-play-state: paused;
+            }}
+            @keyframes marquee {{
+                0% {{ transform: translateX(100%); }}
+                100% {{ transform: translateX(-100%); }}
+            }}
+        </style>
+    </head>
+    <body>
         <div class="marquee-wrapper">
             <div class="marquee-content">
-                {marquee_html}
+                {items_html}
             </div>
         </div>
-    """, unsafe_allow_html=True)
+    </body>
+    </html>
+    """
+    return html_code
+
+# Display Clean Single-Row Marquee
+components.html(render_live_marquee(), height=45)
 
 # Refresh Control & Live Time
 c_time, c_ref = st.columns([4, 1])
