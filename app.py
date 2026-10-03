@@ -14,7 +14,6 @@ now_ist = datetime.now(IST)
 # Custom Styling (Stockview12 Logo, Buttons, Disclaimer)
 st.markdown("""
     <style>
-    /* Stockview12 Logo Styling */
     .logo-container {
         display: flex;
         align-items: center;
@@ -33,7 +32,7 @@ st.markdown("""
         border: 1px solid rgba(255, 255, 255, 0.2);
     }
     .stockview-logo span {
-        color: #00e676; /* Accent color for '12' */
+        color: #00e676;
     }
     .ext-title {
         font-size: 24px;
@@ -41,8 +40,6 @@ st.markdown("""
         color: #111111;
         margin: 0;
     }
-
-    /* Disclaimer Box */
     .disclaimer-box {
         background-color: #fff3cd;
         color: #856404;
@@ -147,10 +144,8 @@ def render_live_marquee():
     """
     return html_code
 
-# Display Clean Single-Row Marquee
 components.html(render_live_marquee(), height=45)
 
-# Refresh Control & Live Time
 c_time, c_ref = st.columns([4, 1])
 with c_time:
     st.caption(f"📅 **Live Market Time:** `{now_ist.strftime('%d/%m/%Y | %I:%M:%S %p IST')}`")
@@ -161,7 +156,6 @@ with c_ref:
 
 st.markdown("---")
 
-# 3. Navigation Menu Bar
 selected_menu = st.radio(
     "📌 Navigation Menu",
     [
@@ -176,7 +170,6 @@ selected_menu = st.radio(
 
 st.markdown("---")
 
-# Exact NIFTY 50 Stocks List
 NIFTY_50 = [
     "ADANIENT.NS", "ADANIPORTS.NS", "APOLLOHOSP.NS", "ASIANPAINT.NS", "AXISBANK.NS",
     "BAJAJ-AUTO.NS", "BAJFINANCE.NS", "BAJAJFINSV.NS", "BEL.NS", "BPCL.NS",
@@ -190,7 +183,6 @@ NIFTY_50 = [
     "TATAMOTORS.NS", "TATASTEEL.NS", "TECHM.NS", "TITAN.NS", "ULTRACEMCO.NS"
 ]
 
-# Fetch Full NIFTY 200 Tickers Dynamically
 @st.cache_data(ttl=86400)
 def get_nifty_200_tickers():
     try:
@@ -202,7 +194,6 @@ def get_nifty_200_tickers():
     except Exception:
         pass
     
-    # Fallback NIFTY 200 List
     return NIFTY_50 + [
         "ABB.NS", "ACC.NS", "AUBANK.NS", "ABBOTINDIA.NS", "ABCAPITAL.NS", "ABFRL.NS", "ADANIENSOL.NS", 
         "ADANIGREEN.NS", "ADANIPOWER.NS", "ATGL.NS", "AWL.NS", "ALKEM.NS", "AMBUJACEM.NS", "APOLLOTYRE.NS", 
@@ -227,7 +218,6 @@ def get_nifty_200_tickers():
         "VBL.NS", "VEDL.NS", "IDEA.NS", "VOLTAS.NS", "WIPRO.NS", "YESBANK.NS", "ZEEL.NS", "ZOMATO.NS", "ZYDUSLIFE.NS"
     ]
 
-# Fetch Full NIFTY 500 Tickers Dynamically
 @st.cache_data(ttl=86400)
 def get_nifty_500_tickers():
     try:
@@ -239,47 +229,11 @@ def get_nifty_500_tickers():
     except Exception:
         pass
     
-    return get_nifty_200_tickers() + [
-        "3MINDIA.NS", "AAVAS.NS", "AEGISCHEM.NS", "AETHER.NS", "AFFLE.NS", "AJANTPHARM.NS", "APLAPOLLO.NS", 
-        "ALKYLAMIN.NS", "ALLCARGO.NS", "ALOKINDS.NS", "AMBER.NS", "ANGELONE.NS", "ANURAS.NS", "APARINDS.NS", 
-        "APTUS.NS", "ACI.NS", "ASAHIINDIA.NS", "ASTERDM.NS", "ATUL.NS", "AVANTIFEED.NS", "BALAMINES.NS", 
-        "BALRAMCHIN.NS", "MAHABANK.NS", "BATAINDIA.NS", "BAYERCROP.NS", "BIRLACORPN.NS", "BSOFT.NS", "BLUEDART.NS", 
-        "BLUESTARCO.NS", "BRIGADE.NS", "MAPMYINDIA.NS", "CAMPUS.NS", "CANFINHOME.NS", "CAPLIPOINT.NS", 
-        "CARBORUNIV.NS", "CASTROLIND.NS", "CEATLTD.NS", "CENTRALBK.NS", "CDSL.NS", "CENTURYPLY.NS", "CENTURYTEX.NS", 
-        "CERA.NS", "CHAMBLFERT.NS", "CHOLAHLDNG.NS", "CLEAN.NS", "COCHINSHIP.NS", "CAMS.NS", "COROMANDEL.NS", 
-        "CRAFTSMAN.NS", "CREDITACC.NS", "CYIENT.NS", "DATAPATTE.NS", "DEEPAKFERT.NS", "DEVYANI.NS", "EIDPARRY.NS", 
-        "EIHOTEL.NS", "EASEMYTRIP.NS", "ELGIEQUIP.NS", "EMAMILTD.NS", "ENDURANCE.NS", "ENGINERSIN.NS", "EQUITASBNK.NS", 
-        "ERIS.NS", "FINEORG.NS", "FINCABLES.NS", "FINPIPE.NS", "FSL.NS", "FIVESTAR.NS", "FORTIS.NS", "GRINFRA.NS", 
-        "GALAXYSURF.NS", "GARFIBRES.NS", "GMDCLTD.NS", "GATEWAY.NS", "GLAXO.NS", "MEDANTA.NS", "GODFRYPHLP.NS", 
-        "GODREJIND.NS", "GRANULES.NS", "GRAPHITE.NS", "GESHIP.NS", "GREAVESCOT.NS", "GRINDWELL.NS", "GNFC.NS", 
-        "GPPL.NS", "GSFC.NS", "GSPL.NS", "HEG.NS", "HFCL.NS", "HAPPSTMNDS.NS", "HIMATSEIDE.NS", "HINDCOPPER.NS", 
-        "HOMEFIRST.NS", "HONAUT.NS", "HUDCO.NS", "ISEC.NS", "IDBI.NS", "IDFC.NS", "IFCI.NS", "IIFL.NS", "IRB.NS", 
-        "IRCON.NS", "ITI.NS", "INDIACEM.NS", "INFIBEAM.NS", "INGERRAND.NS", "INOXWIND.NS", "INTELLECT.NS", 
-        "JBCHEPHARM.NS", "JKCEMENT.NS", "JBMA.NS", "JKLAKSHMI.NS", "JKPAPER.NS", "JMFINANCIL.NS", "JSWINFRA.NS", 
-        "JAMNAAUTO.NS", "JINDALSAW.NS", "JSL.NS", "JUBLINGREA.NS", "JUBLPHARMA.NS", "JUSTDIAL.NS", "JYOTHYLAB.NS", 
-        "KPRMILL.NS", "KNRCON.NS", "KRBL.NS", "KSB.NS", "KPIL.NS", "KANSAINER.NS", "KARURVYSYA.NS", "KEC.NS", 
-        "KIRLOSENG.NS", "LATENTVIEW.NS", "LAURUSLABS.NS", "LXCHEM.NS", "LEMONTREE.NS", "LINDEINDIA.NS", "MMTC.NS", 
-        "MTARTECH.NS", "MGL.NS", "MAHSEAMLES.NS", "MHRIL.NS", "MAHINDCIE.NS", "MRPL.NS", "MASTEK.NS", "MEDPLUS.NS", 
-        "METROPOLIS.NS", "MFSL.NS", "MINDACORP.NS", "MSUMI.NS", "MOTILALOFS.NS", "MCX.NS", "NATCOPHARM.NS", "NAZARA.NS", 
-        "NETWORK18.NS", "NLCINDIA.NS", "NH.NS", "NUVAMA.NS", "OLECTRA.NS", "ORIENTELEC.NS", "PCBL.NS", "PNCINFRA.NS", 
-        "PVRINOX.NS", "PEL.NS", "PPLPHARMA.NS", "POLYMED.NS", "PRAJIND.NS", "PRINCEPIPE.NS", "PRSMJOHNSN.NS", 
-        "PGHL.NS", "PGHH.NS", "QUESS.NS", "RRKABEL.NS", "RBLBANK.NS", "RITES.NS", "RADICO.NS", "RAILTEL.NS", 
-        "RAIN.NS", "RAINBOW.NS", "RAMCOCEM.NS", "RCF.NS", "RATNAMANI.NS", "RAYMOND.NS", "RELIGARE.NS", "ROSSARI.NS", 
-        "ROUTE.NS", "SBFC.NS", "SJVN.NS", "SKFINDIA.NS", "SAFARI.NS", "SAPPHIRE.NS", "SARDAEN.NS", "SAREGAMA.NS", 
-        "SCHAEFFLER.NS", "SCHNEIDER.NS", "SCI.NS", "SHARDACROP.NS", "SHOPERSTOP.NS", "SHREERENUK.NS", "SHYAMMETL.NS", 
-        "SOBHA.NS", "SOLARINDS.NS", "SONATSOFTW.NS", "STARHEALTH.NS", "SWSOLAR.NS", "SUMICHEM.NS", "SPARC.NS", 
-        "SUNTV.NS", "SUNDARMFIN.NS", "SUNDRMFAST.NS", "SUNTECK.NS", "SUPRAJIT.NS", "SUPREMEIND.NS", "SUVENPHAR.NS", 
-        "SYRMA.NS", "TV18BRDCST.NS", "TANLA.NS", "TTML.NS", "TEJASNET.NS", "NIACL.NS", "RAMCOIND.NS", "THERMAX.NS", 
-        "THYROCARE.NS", "TIMKEN.NS", "TRIDENT.NS", "TRIVENI.NS", "TRITURBINE.NS", "UCOBANK.NS", "UTIAMC.NS", 
-        "VGUARD.NS", "VMART.NS", "VIPIND.NS", "VAIBHAVGBL.NS", "VTL.NS", "VARROC.NS", "MANYAVAR.NS", "VENKEYS.NS", 
-        "VIJAYA.NS", "VINATIORGA.NS", "WELCORP.NS", "WELSPUNLIV.NS", "WESTLIFE.NS", "WHIRLPOOL.NS", "WOCKPHARMA.NS", 
-        "ZENSARTECH.NS", "ZYDUSWELL.NS"
-    ]
+    return get_nifty_200_tickers()
 
 NIFTY_200 = get_nifty_200_tickers()
 NIFTY_500 = get_nifty_500_tickers()
 
-# Core Scanner Function
 @st.cache_data(ttl=60)
 def scan_bollinger(stocks, interval, period, strategy_type, tf_name):
     selected = []
@@ -301,7 +255,6 @@ def scan_bollinger(stocks, interval, period, strategy_type, tf_name):
             if len(df) < 21:
                 continue
 
-            # Resampling Logic
             if tf_name == "10m":
                 df = df.resample('10min').agg({'Open':'first', 'High':'max', 'Low':'min', 'Close':'last', 'Volume':'sum'}).dropna()
             elif tf_name == "2h":
@@ -340,7 +293,6 @@ def scan_bollinger(stocks, interval, period, strategy_type, tf_name):
                     })
 
             elif strategy_type == "Condition 2: Completely Below Lower Band (Hammer / Morning Star Gap)":
-                # Strict Verification: The entire High price must be below Lower Band
                 below_lower = (curr['High'] < curr['Lower_Band']) and (curr['Low'] < curr['Lower_Band'])
                 
                 lower_shadow = min(curr['Open'], curr['Close']) - curr['Low']
@@ -380,10 +332,11 @@ if selected_menu == "📈 Live Scanner":
         )
 
     with c2:
+        # Clarified Timeframe Labels so 1m (1-Min) and 1M (1-Month) are clearly separate
         timeframe = st.selectbox(
             "⏱️ Select Timeframe",
-            ["5m", "10m", "15m", "30m", "1h", "2h", "4h", "1d", "1w", "1m"],
-            index=7
+            ["1-Min", "5-Min", "10-Min", "15-Min", "30-Min", "1-Hour", "2-Hour", "4-Hour", "1-Day", "1-Week", "1-Month"],
+            index=8
         )
 
     with c3:
@@ -398,20 +351,20 @@ if selected_menu == "📈 Live Scanner":
         )
 
     tf_map = {
-        "5m": ("5m", "5d"),
-        "10m": ("5m", "5d"),
-        "15m": ("15m", "5d"),
-        "30m": ("30m", "5d"),
-        "1h": ("60m", "1mo"),
-        "2h": ("60m", "1mo"),
-        "4h": ("60m", "3mo"),
-        "1d": ("1d", "6mo"),
-        "1w": ("1wk", "2y"),
-        "1m": ("1mo", "5y")
+        "1-Min": ("1m", "1d"),
+        "5-Min": ("5m", "5d"),
+        "10-Min": ("5m", "5d"),
+        "15-Min": ("15m", "5d"),
+        "30-Min": ("30m", "5d"),
+        "1-Hour": ("60m", "1mo"),
+        "2-Hour": ("60m", "1mo"),
+        "4-Hour": ("60m", "3mo"),
+        "1-Day": ("1d", "6mo"),
+        "1-Week": ("1wk", "2y"),
+        "1-Month": ("1mo", "5y")
     }
     interval, period = tf_map[timeframe]
 
-    # Segment Routing Logic
     if "NIFTY 50 " in segment:
         stocks_to_scan = NIFTY_50
     elif "NIFTY 200 " in segment:
@@ -428,7 +381,6 @@ if selected_menu == "📈 Live Scanner":
     else:
         st.info(f"Selected condition-e current live data-te {timeframe} timeframe-e kono stock pawa jayni.")
 
-# Page 2: Live Watchlist
 elif selected_menu == "⭐ Live Watchlist":
     st.subheader("⭐ Custom Live Watchlist")
     user_symbols = st.text_input("Stock Symbols Type Korun (Comma Separated):", "RELIANCE, SBIN, TATAMOTORS, INFY, HDFCBANK")
@@ -456,38 +408,34 @@ elif selected_menu == "⭐ Live Watchlist":
         if watchlist_data:
             st.dataframe(pd.DataFrame(watchlist_data), use_container_width=True)
 
-# Page 3: Intraday Stocks
 elif selected_menu == "⚡ Intraday Stocks":
     st.subheader("⚡ Intraday Focus Stocks (High Liquidity & Volatility)")
     st.caption("Intraday trading-er jonno suitable high-volume stock scanning (15m timeframe):")
     intraday_list = NIFTY_50[:20]
-    results = scan_bollinger(intraday_list, "15m", "5d", "Condition 1: Lower Band Cut (Strong Green Candle & Engulfing/Reversal)", "15m")
+    results = scan_bollinger(intraday_list, "15m", "5d", "Condition 1: Lower Band Cut (Strong Green Candle & Engulfing/Reversal)", "15-Min")
     if results:
         st.dataframe(pd.DataFrame(results), use_container_width=True)
     else:
         st.info("Current Intraday timeframe-e (15m) kono setup toiri hoyni.")
 
-# Page 4: Short Term Stocks
 elif selected_menu == "📅 Short Term Stocks":
     st.subheader("📅 Short Term / Swing Trading Stocks")
     st.caption("Daily timeframe-e breakout ba reversal pattern scan kora hocche:")
-    results = scan_bollinger(NIFTY_50, "1d", "6mo", "Condition 1: Lower Band Cut (Strong Green Candle & Engulfing/Reversal)", "1d")
+    results = scan_bollinger(NIFTY_50, "1d", "6mo", "Condition 1: Lower Band Cut (Strong Green Candle & Engulfing/Reversal)", "1-Day")
     if results:
         st.dataframe(pd.DataFrame(results), use_container_width=True)
     else:
         st.info("Daily timeframe-e kono Short-term setup pawa jayni.")
 
-# Page 5: Long Term Stocks
 elif selected_menu == "🏦 Long Term Stocks":
     st.subheader("🏦 Long Term Fundamental Wealth Creators")
     st.caption("Weekly timeframe-e deep value zone-e thaka stocks:")
-    results = scan_bollinger(NIFTY_50, "1wk", "2y", "Condition 2: Completely Below Lower Band (Hammer / Morning Star Gap)", "1w")
+    results = scan_bollinger(NIFTY_50, "1wk", "2y", "Condition 2: Completely Below Lower Band (Hammer / Morning Star Gap)", "1-Week")
     if results:
         st.dataframe(pd.DataFrame(results), use_container_width=True)
     else:
         st.info("Weekly timeframe-e kono long-term value setup pawa jayni.")
 
-# Footer Disclaimer Note
 st.markdown("""
     <div class="disclaimer-box">
         ⚠️ <b>কাজের সতর্কতা ও ডিসক্লেইমার:</b> এখানে কোনো শেয়ার বা স্টক বাই (Buy) অথবা সেল (Sell) করার অনুমতি বা পরামর্শ দেয়া হয় না। এই পোর্টালটি সম্পূর্ণ শিক্ষার উদ্দেশ্যে (Educational Purpose) প্রণীত।
