@@ -240,7 +240,7 @@ NIFTY_500 = [
     "ITC.NS", "INDUSINDBK.NS", "INFY.NS", "JSWSTEEL.NS", "KOTAKBANK.NS",
     "LT.NS", "LTIM.NS", "M&M.NS", "MARUTI.NS", "NTPC.NS",
     "NESTLEIND.NS", "ONGC.NS", "POWERGRID.NS", "RELIANCE.NS", "SBILIFE.NS",
-    "SHRIRAMFIN.NS", "SBIN.NS", "SUNPHARMA.NS", "TCS.NS", "TATACONSUM.NS",
+    "SHRIRAMFIN.NS", "SBIN.NS", "SUNPHARMA.NS", "TATACONSUM.NS", "TCS.NS",
     "TATAMOTORS.NS", "TATASTEEL.NS", "TECHM.NS", "TITAN.NS", "ULTRACEMCO.NS",
     "ABB.NS", "ACC.NS", "AUBANK.NS", "ABBOTINDIA.NS", "ABCAPITAL.NS", "ABFRL.NS", 
     "ADANIENSOL.NS", "ADANIGREEN.NS", "ADANIPOWER.NS", "ATGL.NS", "AWL.NS", "ALKEM.NS", 
@@ -320,6 +320,15 @@ NIFTY_500 = [
     "SANGHVIMOV.NS", "TIPSINDLTD.NS", "VIPULLTD.NS", "ZOTA.NS"
 ]
 
+# ==========================================
+# 📌 4. OTHER POPULAR STOCKS (Outside Nifty 500)
+# ==========================================
+OTHER_STOCKS = [
+    "ALOKINDS.NS", "BCG.NS", "EXICOM.NS", "IEX.NS", "IREDA.NS", "JPPOWER.NS",
+    "LLOYDSENGG.NS", "NHPC.NS", "SJVN.NS", "SOUTHBANK.NS", "YESBANK.NS", "URJA.NS",
+    "HUDCO.NS", "RPOWER.NS", "INFIBEAM.NS", "TRIDENT.NS", "SUZLON.NS"
+]
+
 # Core Scanner Function
 def scan_bollinger(stocks, interval, period, strategy_type, tf_name):
     selected = []
@@ -333,9 +342,6 @@ def scan_bollinger(stocks, interval, period, strategy_type, tf_name):
 
     for symbol in stocks:
         try:
-            if "HEGAM" in symbol:
-                continue
-
             if symbol in data:
                 df = data[symbol].dropna()
             else:
@@ -408,7 +414,7 @@ def scan_bollinger(stocks, interval, period, strategy_type, tf_name):
 
 # Page 1: Main Live Scanner
 if selected_menu == "📈 Live Scanner":
-    st.subheader("⚙️️ Scanner Settings")
+    st.subheader("⚙ Scanner Settings")
     c1, c2, c3 = st.columns(3)
 
     with c1:
@@ -433,7 +439,9 @@ if selected_menu == "📈 Live Scanner":
             [
                 f"NIFTY 50 ({len(NIFTY_50)} Stocks)",
                 f"NIFTY 200 ({len(NIFTY_200)} Stocks)",
-                f"NIFTY 500 ({len(NIFTY_500)} Stocks)"
+                f"NIFTY 500 ({len(NIFTY_500)} Stocks)",
+                f"Other Popular Stocks ({len(OTHER_STOCKS)} Stocks)",
+                "🔍 Custom Search (Type Any NSE Stock Symbol)"
             ],
             index=0
         )
@@ -453,21 +461,30 @@ if selected_menu == "📈 Live Scanner":
     }
     interval, period = tf_map[timeframe]
 
+    stocks_to_scan = []
+
     if "NIFTY 50 " in segment:
         stocks_to_scan = NIFTY_50
     elif "NIFTY 200 " in segment:
         stocks_to_scan = NIFTY_200
-    else:
+    elif "NIFTY 500 " in segment:
         stocks_to_scan = NIFTY_500
+    elif "Other Popular" in segment:
+        stocks_to_scan = OTHER_STOCKS
+    elif "Custom Search" in segment:
+        user_input = st.text_input("NSE Stock Symbol Type Korun (Comma Separated):", "IREDA, SJVN, BCPL, IEX, RVNL")
+        if user_input:
+            stocks_to_scan = [s.strip().upper() + ".NS" for s in user_input.split(",") if s.strip()]
 
-    with st.spinner(f"Scanning {len(stocks_to_scan)} stocks in {timeframe} timeframe..."):
-        results = scan_bollinger(stocks_to_scan, interval, period, strategy, timeframe)
+    if stocks_to_scan:
+        with st.spinner(f"Scanning {len(stocks_to_scan)} stocks in {timeframe} timeframe..."):
+            results = scan_bollinger(stocks_to_scan, interval, period, strategy, timeframe)
 
-    if results:
-        st.success(f"Mot {len(results)} ti stock pawa geche selected condition onujayi ({timeframe} timeframe)!")
-        st.dataframe(pd.DataFrame(results), use_container_width=True)
-    else:
-        st.info(f"Selected condition-e current live data-te {timeframe} timeframe-e kono stock pawa jayni.")
+        if results:
+            st.success(f"Mot {len(results)} ti stock pawa geche selected condition onujayi ({timeframe} timeframe)!")
+            st.dataframe(pd.DataFrame(results), use_container_width=True)
+        else:
+            st.info(f"Selected condition-e current live data-te {timeframe} timeframe-e kono stock pawa jayni.")
 
 elif selected_menu == "⭐ Live Watchlist":
     st.subheader("⭐ Custom Live Watchlist")
