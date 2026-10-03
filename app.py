@@ -141,8 +141,8 @@ with c1:
 with c2:
     timeframe = st.selectbox(
         "⏱️ Select Timeframe",
-        ["5m", "15m", "30m", "1h", "2h", "4h", "1d", "1w", "1m"],
-        index=6
+        ["5m", "10m", "15m", "30m", "1h", "2h", "4h", "1d", "1w", "1m"],
+        index=7
     )
 
 with c3:
@@ -151,6 +151,7 @@ with c3:
 # Map selected timeframe to yfinance interval & period
 tf_map = {
     "5m": ("5m", "5d"),
+    "10m": ("5m", "5d"),
     "15m": ("15m", "5d"),
     "30m": ("30m", "5d"),
     "1h": ("60m", "1mo"),
@@ -263,8 +264,10 @@ def scan_bollinger(stocks, interval, period, strategy_type, tf_name):
             if len(df) < 21:
                 continue
 
-            # Resample for 2h and 4h
-            if tf_name == "2h":
+            # Custom Resampling for 10m, 2h, and 4h
+            if tf_name == "10m":
+                df = df.resample('10min').agg({'Open':'first', 'High':'max', 'Low':'min', 'Close':'last', 'Volume':'sum'}).dropna()
+            elif tf_name == "2h":
                 df = df.resample('2h').agg({'Open':'first', 'High':'max', 'Low':'min', 'Close':'last', 'Volume':'sum'}).dropna()
             elif tf_name == "4h":
                 df = df.resample('4h').agg({'Open':'first', 'High':'max', 'Low':'min', 'Close':'last', 'Volume':'sum'}).dropna()
@@ -286,13 +289,13 @@ def scan_bollinger(stocks, interval, period, strategy_type, tf_name):
             if strategy_type == "Condition 1: Lower Band Cut (Strong Green Candle & Engulfing/Reversal)":
                 is_green = curr['Close'] > curr['Open']
                 
-                # Lower band cut condition (Low or Open touches/cuts lower band)
+                # Lower band cut condition
                 cuts_lower = curr['Low'] <= curr['Lower_Band'] and curr['Close'] >= curr['Lower_Band']
                 
-                # Bullish Engulfing or Piercing: Current close/high equals or exceeds previous candle's high/open
+                # Bullish Engulfing or Piercing
                 bullish_engulfing = (curr['Close'] >= prev['Open']) or (curr['Close'] >= prev['High'] * 0.98)
                 
-                # Strong body relative to range (small shadows allowed)
+                # Strong body relative to range
                 strong_body = (body_curr / range_curr) > 0.50 if range_curr > 0 else False
 
                 if is_green and cuts_lower and bullish_engulfing and strong_body:
@@ -307,10 +310,10 @@ def scan_bollinger(stocks, interval, period, strategy_type, tf_name):
                     })
 
             elif strategy_type == "Condition 2: Completely Below Lower Band (Hammer / Morning Star Gap)":
-                # High is strictly less than or equal to Lower Band (No Touch / Gap below)
+                # High is strictly less than or equal to Lower Band (No Touch)
                 below_lower = curr['High'] <= curr['Lower_Band']
                 
-                # Hammer Pattern Logic: Long lower shadow, small upper shadow/body
+                # Hammer Pattern Logic
                 lower_shadow = min(curr['Open'], curr['Close']) - curr['Low']
                 upper_shadow = curr['High'] - max(curr['Open'], curr['Close'])
                 
