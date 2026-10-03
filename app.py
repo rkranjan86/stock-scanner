@@ -11,7 +11,7 @@ st.set_page_config(page_title="Stockview12 - Bollinger Band Live Scanner", layou
 IST = pytz.timezone('Asia/Kolkata')
 now_ist = datetime.now(IST)
 
-# Custom Styling (Stockview12 Logo, Buttons, Disclaimer)
+# Custom Styling
 st.markdown("""
     <style>
     .logo-container {
@@ -150,7 +150,7 @@ c_time, c_ref = st.columns([4, 1])
 with c_time:
     st.caption(f"📅 **Live Market Time:** `{now_ist.strftime('%d/%m/%Y | %I:%M:%S %p IST')}`")
 with c_ref:
-    if st.button("🔄 Refresh Data", use_container_width=True):
+    if st.button("🔄 Refresh Data & Cache", use_container_width=True):
         st.cache_data.clear()
         st.rerun()
 
@@ -194,29 +194,7 @@ def get_nifty_200_tickers():
     except Exception:
         pass
     
-    return NIFTY_50 + [
-        "ABB.NS", "ACC.NS", "AUBANK.NS", "ABBOTINDIA.NS", "ABCAPITAL.NS", "ABFRL.NS", "ADANIENSOL.NS", 
-        "ADANIGREEN.NS", "ADANIPOWER.NS", "ATGL.NS", "AWL.NS", "ALKEM.NS", "AMBUJACEM.NS", "APOLLOTYRE.NS", 
-        "ASHOKLEY.NS", "ASTRAL.NS", "AUROPHARMA.NS", "BALKRISIND.NS", "BANDHANBNK.NS", "BANKBARODA.NS", 
-        "BANKINDIA.NS", "BERGEPAINT.NS", "BDL.NS", "BHARATFORG.NS", "BHEL.NS", "BIOCON.NS", "BOSCHLTD.NS", 
-        "CANBK.NS", "CGPOWER.NS", "CHOLAFIN.NS", "COFORGE.NS", "COLPAL.NS", "CONCOR.NS", "CROMPTON.NS", 
-        "CUMMINSIND.NS", "DABUR.NS", "DALBHARAT.NS", "DEEPAKNTR.NS", "DELHIVERY.NS", "DIXON.NS", "DLF.NS", 
-        "LALPATHLAB.NS", "ESCORTS.NS", "EXIDEIND.NS", "FEDERALBNK.NS", "GAIL.NS", "GLAND.NS", "GLENMARK.NS", 
-        "GMRAIRPORT.NS", "GODREJCP.NS", "GODREJPROP.NS", "GUJGASLTD.NS", "HDFCAMC.NS", "HAVELLS.NS", 
-        "HINDPETRO.NS", "HINDZINC.NS", "ICICIGI.NS", "ICICIPRULI.NS", "IDFCFIRSTB.NS", "INDIAMART.NS", 
-        "INDIANB.NS", "IEX.NS", "INDHOTEL.NS", "IOC.NS", "IRCTC.NS", "IRFC.NS", "IGL.NS", "INDUSTOWER.NS", 
-        "NAUKRI.NS", "INDIGO.NS", "IPCALAB.NS", "JSWENERGY.NS", "JINDALSTEL.NS", "JIOFIN.NS", "JUBLFOOD.NS", 
-        "KPITTECH.NS", "KAJARIACER.NS", "KALYANKJIL.NS", "KEI.NS", "L&TFH.NS", "LTTS.NS", "LICHSGFIN.NS", 
-        "LICI.NS", "LUPIN.NS", "MRF.NS", "LODHA.NS", "M&MFIN.NS", "MANAPPURAM.NS", "MARICO.NS", "MAXHEALTH.NS", 
-        "MAZDOCK.NS", "MPHASIS.NS", "MUTHOOTFIN.NS", "NATIONALUM.NS", "NAVINFLUOR.NS", "NHPC.NS", "NMDC.NS", 
-        "NYKAA.NS", "OBEROIRLTY.NS", "OIL.NS", "PAYTM.NS", "OFSS.NS", "POLICYBZR.NS", "PIIND.NS", "PNBHOUSING.NS", 
-        "PAGEIND.NS", "PATANJALI.NS", "PERSISTENT.NS", "PETRONET.NS", "PFC.NS", "PHOENIXLTD.NS", "PIDILITIND.NS", 
-        "POLYCAB.NS", "POONAWALLA.NS", "PRESTIGE.NS", "PNB.NS", "REC.NS", "RVNL.NS", "MOTHERSON.NS", "SAIL.NS", 
-        "SHREECEM.NS", "SIEMENS.NS", "SONACOMS.NS", "SRF.NS", "SBICARD.NS", "SUZLON.NS", "SYNGENE.NS", 
-        "TVSMOTOR.NS", "TATACOMM.NS", "TATAELXSI.NS", "TATAPOWER.NS", "TATATECH.NS", "TIINDIA.NS", "TORNTPHARM.NS", 
-        "TORNTPOWER.NS", "TRENT.NS", "UNOMINDA.NS", "UPL.NS", "UNIONBANK.NS", "UBL.NS", "MCDOWELL-N.NS", 
-        "VBL.NS", "VEDL.NS", "IDEA.NS", "VOLTAS.NS", "WIPRO.NS", "YESBANK.NS", "ZEEL.NS", "ZOMATO.NS", "ZYDUSLIFE.NS"
-    ]
+    return NIFTY_50
 
 @st.cache_data(ttl=86400)
 def get_nifty_500_tickers():
@@ -234,7 +212,7 @@ def get_nifty_500_tickers():
 NIFTY_200 = get_nifty_200_tickers()
 NIFTY_500 = get_nifty_500_tickers()
 
-@st.cache_data(ttl=60)
+# Core Scanner Function (No caching for scan calculations to prevent cross-timeframe state contamination)
 def scan_bollinger(stocks, interval, period, strategy_type, tf_name):
     selected = []
     if not stocks:
@@ -252,14 +230,12 @@ def scan_bollinger(stocks, interval, period, strategy_type, tf_name):
             else:
                 continue
 
-            if len(df) < 21:
-                continue
-
-            if tf_name == "10m":
+            # Resampling Handling for custom timeframe options
+            if tf_name == "10-Min":
                 df = df.resample('10min').agg({'Open':'first', 'High':'max', 'Low':'min', 'Close':'last', 'Volume':'sum'}).dropna()
-            elif tf_name == "2h":
+            elif tf_name == "2-Hour":
                 df = df.resample('2h').agg({'Open':'first', 'High':'max', 'Low':'min', 'Close':'last', 'Volume':'sum'}).dropna()
-            elif tf_name == "4h":
+            elif tf_name == "4-Hour":
                 df = df.resample('4h').agg({'Open':'first', 'High':'max', 'Low':'min', 'Close':'last', 'Volume':'sum'}).dropna()
 
             if len(df) < 21:
@@ -293,6 +269,7 @@ def scan_bollinger(stocks, interval, period, strategy_type, tf_name):
                     })
 
             elif strategy_type == "Condition 2: Completely Below Lower Band (Hammer / Morning Star Gap)":
+                # Strict Rule: High & Low both below Lower Band
                 below_lower = (curr['High'] < curr['Lower_Band']) and (curr['Low'] < curr['Lower_Band'])
                 
                 lower_shadow = min(curr['Open'], curr['Close']) - curr['Low']
@@ -332,7 +309,6 @@ if selected_menu == "📈 Live Scanner":
         )
 
     with c2:
-        # Clarified Timeframe Labels so 1m (1-Min) and 1M (1-Month) are clearly separate
         timeframe = st.selectbox(
             "⏱️ Select Timeframe",
             ["1-Min", "5-Min", "10-Min", "15-Min", "30-Min", "1-Hour", "2-Hour", "4-Hour", "1-Day", "1-Week", "1-Month"],
@@ -361,7 +337,7 @@ if selected_menu == "📈 Live Scanner":
         "4-Hour": ("60m", "3mo"),
         "1-Day": ("1d", "6mo"),
         "1-Week": ("1wk", "2y"),
-        "1-Month": ("1mo", "5y")
+        "1-Month": ("1mo", "10y")
     }
     interval, period = tf_map[timeframe]
 
