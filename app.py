@@ -176,22 +176,108 @@ selected_menu = st.radio(
 
 st.markdown("---")
 
-# Stock Lists Definition
+# Exact NIFTY 50 Stocks List
 NIFTY_50 = [
-    "RELIANCE.NS", "TCS.NS", "HDFCBANK.NS", "INFY.NS", "ICICIBANK.NS", "HINDUNILVR.NS", "ITC.NS", "SBIN.NS",
-    "BHARTIARTL.NS", "LTIM.NS", "KOTAKBANK.NS", "LT.NS", "AXISBANK.NS", "HCLTECH.NS", "BAJFINANCE.NS",
-    "ASIANPAINT.NS", "MARUTI.NS", "SUNPHARMA.NS", "TITAN.NS", "ULTRACEMCO.NS", "TATAMOTORS.NS", "NTPC.NS",
-    "ONGC.NS", "POWERGRID.NS", "ADANIENT.NS", "ADANIPORTS.NS", "COALINDIA.NS", "BAJAJFINSV.NS", "TATASTEEL.NS",
-    "M&M.NS", "NESTLEIND.NS", "GRASIM.NS", "TECHM.NS", "HEROMOTOCO.NS", "CIPLA.NS", "WIPRO.NS", "HDFCLIFE.NS",
-    "BPCL.NS", "EICHERMOT.NS", "DRREDDY.NS", "DIVISLAB.NS", "TATACONSUM.NS", "SBILIFE.NS", "BAJAJ-AUTO.NS",
-    "BRITANNIA.NS", "INDUSINDBK.NS", "HINDALCO.NS", "JSWSTEEL.NS", "APOLLOHOSP.NS", "UPL.NS"
+    "ADANIENT.NS", "ADANIPORTS.NS", "APOLLOHOSP.NS", "ASIANPAINT.NS", "AXISBANK.NS",
+    "BAJAJ-AUTO.NS", "BAJFINANCE.NS", "BAJAJFINSV.NS", "BEL.NS", "BPCL.NS",
+    "BHARTIARTL.NS", "BRITANNIA.NS", "CIPLA.NS", "COALINDIA.NS", "DIVISLAB.NS",
+    "DRREDDY.NS", "EICHERMOT.NS", "GRASIM.NS", "HCLTECH.NS", "HDFCBANK.NS",
+    "HDFCLIFE.NS", "HEROMOTOCO.NS", "HINDALCO.NS", "HINDUNILVR.NS", "ICICIBANK.NS",
+    "ITC.NS", "INDUSINDBK.NS", "INFY.NS", "JSWSTEEL.NS", "KOTAKBANK.NS",
+    "LT.NS", "LTIM.NS", "M&M.NS", "MARUTI.NS", "NTPC.NS",
+    "NESTLEIND.NS", "ONGC.NS", "POWERGRID.NS", "RELIANCE.NS", "SBILIFE.NS",
+    "SHRIRAMFIN.NS", "SBIN.NS", "SUNPHARMA.NS", "TCS.NS", "TATACONSUM.NS",
+    "TATAMOTORS.NS", "TATASTEEL.NS", "TECHM.NS", "TITAN.NS", "ULTRACEMCO.NS"
 ]
 
-NIFTY_500 = NIFTY_50 + [
-    "ABB.NS", "ACC.NS", "AUBANK.NS", "BEL.NS", "BHEL.NS", "BPCL.NS", "GAIL.NS", "IDFCFIRSTB.NS", 
-    "IRCTC.NS", "IRFC.NS", "JIOFIN.NS", "LICHSGFIN.NS", "NHPC.NS", "NMDC.NS", "POLYCAB.NS", "RECLTD.NS", 
-    "PFC.NS", "SAIL.NS", "TATACOMM.NS", "TATAPOWER.NS", "VOLTAS.NS", "ZEEL.NS", "ZOMATO.NS"
-]
+# Fetch Full NIFTY 200 Tickers Dynamically
+@st.cache_data(ttl=86400)
+def get_nifty_200_tickers():
+    try:
+        url = "https://archives.nseindia.com/content/indices/ind_nifty200list.csv"
+        df = pd.read_csv(url)
+        tickers = [f"{symbol}.NS" for symbol in df['Symbol'].tolist()]
+        if len(tickers) >= 180:
+            return tickers
+    except Exception:
+        pass
+    
+    # Fallback NIFTY 200 List
+    return NIFTY_50 + [
+        "ABB.NS", "ACC.NS", "AUBANK.NS", "ABBOTINDIA.NS", "ABCAPITAL.NS", "ABFRL.NS", "ADANIENSOL.NS", 
+        "ADANIGREEN.NS", "ADANIPOWER.NS", "ATGL.NS", "AWL.NS", "ALKEM.NS", "AMBUJACEM.NS", "APOLLOTYRE.NS", 
+        "ASHOKLEY.NS", "ASTRAL.NS", "AUROPHARMA.NS", "BALKRISIND.NS", "BANDHANBNK.NS", "BANKBARODA.NS", 
+        "BANKINDIA.NS", "BERGEPAINT.NS", "BDL.NS", "BHARATFORG.NS", "BHEL.NS", "BIOCON.NS", "BOSCHLTD.NS", 
+        "CANBK.NS", "CGPOWER.NS", "CHOLAFIN.NS", "COFORGE.NS", "COLPAL.NS", "CONCOR.NS", "CROMPTON.NS", 
+        "CUMMINSIND.NS", "DABUR.NS", "DALBHARAT.NS", "DEEPAKNTR.NS", "DELHIVERY.NS", "DIXON.NS", "DLF.NS", 
+        "LALPATHLAB.NS", "ESCORTS.NS", "EXIDEIND.NS", "FEDERALBNK.NS", "GAIL.NS", "GLAND.NS", "GLENMARK.NS", 
+        "GMRAIRPORT.NS", "GODREJCP.NS", "GODREJPROP.NS", "GUJGASLTD.NS", "HDFCAMC.NS", "HAVELLS.NS", 
+        "HINDPETRO.NS", "HINDZINC.NS", "ICICIGI.NS", "ICICIPRULI.NS", "IDFCFIRSTB.NS", "INDIAMART.NS", 
+        "INDIANB.NS", "IEX.NS", "INDHOTEL.NS", "IOC.NS", "IRCTC.NS", "IRFC.NS", "IGL.NS", "INDUSTOWER.NS", 
+        "NAUKRI.NS", "INDIGO.NS", "IPCALAB.NS", "JSWENERGY.NS", "JINDALSTEL.NS", "JIOFIN.NS", "JUBLFOOD.NS", 
+        "KPITTECH.NS", "KAJARIACER.NS", "KALYANKJIL.NS", "KEI.NS", "L&TFH.NS", "LTTS.NS", "LICHSGFIN.NS", 
+        "LICI.NS", "LUPIN.NS", "MRF.NS", "LODHA.NS", "M&MFIN.NS", "MANAPPURAM.NS", "MARICO.NS", "MAXHEALTH.NS", 
+        "MAZDOCK.NS", "MPHASIS.NS", "MUTHOOTFIN.NS", "NATIONALUM.NS", "NAVINFLUOR.NS", "NHPC.NS", "NMDC.NS", 
+        "NYKAA.NS", "OBEROIRLTY.NS", "OIL.NS", "PAYTM.NS", "OFSS.NS", "POLICYBZR.NS", "PIIND.NS", "PNBHOUSING.NS", 
+        "PAGEIND.NS", "PATANJALI.NS", "PERSISTENT.NS", "PETRONET.NS", "PFC.NS", "PHOENIXLTD.NS", "PIDILITIND.NS", 
+        "POLYCAB.NS", "POONAWALLA.NS", "PRESTIGE.NS", "PNB.NS", "REC.NS", "RVNL.NS", "MOTHERSON.NS", "SAIL.NS", 
+        "SHREECEM.NS", "SIEMENS.NS", "SONACOMS.NS", "SRF.NS", "SBICARD.NS", "SUZLON.NS", "SYNGENE.NS", 
+        "TVSMOTOR.NS", "TATACOMM.NS", "TATAELXSI.NS", "TATAPOWER.NS", "TATATECH.NS", "TIINDIA.NS", "TORNTPHARM.NS", 
+        "TORNTPOWER.NS", "TRENT.NS", "UNOMINDA.NS", "UPL.NS", "UNIONBANK.NS", "UBL.NS", "MCDOWELL-N.NS", 
+        "VBL.NS", "VEDL.NS", "IDEA.NS", "VOLTAS.NS", "WIPRO.NS", "YESBANK.NS", "ZEEL.NS", "ZOMATO.NS", "ZYDUSLIFE.NS"
+    ]
+
+# Fetch Full NIFTY 500 Tickers Dynamically
+@st.cache_data(ttl=86400)
+def get_nifty_500_tickers():
+    try:
+        url = "https://archives.nseindia.com/content/indices/ind_nifty500list.csv"
+        df = pd.read_csv(url)
+        tickers = [f"{symbol}.NS" for symbol in df['Symbol'].tolist()]
+        if len(tickers) >= 450:
+            return tickers
+    except Exception:
+        pass
+    
+    return get_nifty_200_tickers() + [
+        "3MINDIA.NS", "AAVAS.NS", "AEGISCHEM.NS", "AETHER.NS", "AFFLE.NS", "AJANTPHARM.NS", "APLAPOLLO.NS", 
+        "ALKYLAMIN.NS", "ALLCARGO.NS", "ALOKINDS.NS", "AMBER.NS", "ANGELONE.NS", "ANURAS.NS", "APARINDS.NS", 
+        "APTUS.NS", "ACI.NS", "ASAHIINDIA.NS", "ASTERDM.NS", "ATUL.NS", "AVANTIFEED.NS", "BALAMINES.NS", 
+        "BALRAMCHIN.NS", "MAHABANK.NS", "BATAINDIA.NS", "BAYERCROP.NS", "BIRLACORPN.NS", "BSOFT.NS", "BLUEDART.NS", 
+        "BLUESTARCO.NS", "BRIGADE.NS", "MAPMYINDIA.NS", "CAMPUS.NS", "CANFINHOME.NS", "CAPLIPOINT.NS", 
+        "CARBORUNIV.NS", "CASTROLIND.NS", "CEATLTD.NS", "CENTRALBK.NS", "CDSL.NS", "CENTURYPLY.NS", "CENTURYTEX.NS", 
+        "CERA.NS", "CHAMBLFERT.NS", "CHOLAHLDNG.NS", "CLEAN.NS", "COCHINSHIP.NS", "CAMS.NS", "COROMANDEL.NS", 
+        "CRAFTSMAN.NS", "CREDITACC.NS", "CYIENT.NS", "DATAPATTE.NS", "DEEPAKFERT.NS", "DEVYANI.NS", "EIDPARRY.NS", 
+        "EIHOTEL.NS", "EASEMYTRIP.NS", "ELGIEQUIP.NS", "EMAMILTD.NS", "ENDURANCE.NS", "ENGINERSIN.NS", "EQUITASBNK.NS", 
+        "ERIS.NS", "FINEORG.NS", "FINCABLES.NS", "FINPIPE.NS", "FSL.NS", "FIVESTAR.NS", "FORTIS.NS", "GRINFRA.NS", 
+        "GALAXYSURF.NS", "GARFIBRES.NS", "GMDCLTD.NS", "GATEWAY.NS", "GLAXO.NS", "MEDANTA.NS", "GODFRYPHLP.NS", 
+        "GODREJIND.NS", "GRANULES.NS", "GRAPHITE.NS", "GESHIP.NS", "GREAVESCOT.NS", "GRINDWELL.NS", "GNFC.NS", 
+        "GPPL.NS", "GSFC.NS", "GSPL.NS", "HEG.NS", "HFCL.NS", "HAPPSTMNDS.NS", "HIMATSEIDE.NS", "HINDCOPPER.NS", 
+        "HOMEFIRST.NS", "HONAUT.NS", "HUDCO.NS", "ISEC.NS", "IDBI.NS", "IDFC.NS", "IFCI.NS", "IIFL.NS", "IRB.NS", 
+        "IRCON.NS", "ITI.NS", "INDIACEM.NS", "INFIBEAM.NS", "INGERRAND.NS", "INOXWIND.NS", "INTELLECT.NS", 
+        "JBCHEPHARM.NS", "JKCEMENT.NS", "JBMA.NS", "JKLAKSHMI.NS", "JKPAPER.NS", "JMFINANCIL.NS", "JSWINFRA.NS", 
+        "JAMNAAUTO.NS", "JINDALSAW.NS", "JSL.NS", "JUBLINGREA.NS", "JUBLPHARMA.NS", "JUSTDIAL.NS", "JYOTHYLAB.NS", 
+        "KPRMILL.NS", "KNRCON.NS", "KRBL.NS", "KSB.NS", "KPIL.NS", "KANSAINER.NS", "KARURVYSYA.NS", "KEC.NS", 
+        "KIRLOSENG.NS", "LATENTVIEW.NS", "LAURUSLABS.NS", "LXCHEM.NS", "LEMONTREE.NS", "LINDEINDIA.NS", "MMTC.NS", 
+        "MTARTECH.NS", "MGL.NS", "MAHSEAMLES.NS", "MHRIL.NS", "MAHINDCIE.NS", "MRPL.NS", "MASTEK.NS", "MEDPLUS.NS", 
+        "METROPOLIS.NS", "MFSL.NS", "MINDACORP.NS", "MSUMI.NS", "MOTILALOFS.NS", "MCX.NS", "NATCOPHARM.NS", "NAZARA.NS", 
+        "NETWORK18.NS", "NLCINDIA.NS", "NH.NS", "NUVAMA.NS", "OLECTRA.NS", "ORIENTELEC.NS", "PCBL.NS", "PNCINFRA.NS", 
+        "PVRINOX.NS", "PEL.NS", "PPLPHARMA.NS", "POLYMED.NS", "PRAJIND.NS", "PRINCEPIPE.NS", "PRSMJOHNSN.NS", 
+        "PGHL.NS", "PGHH.NS", "QUESS.NS", "RRKABEL.NS", "RBLBANK.NS", "RITES.NS", "RADICO.NS", "RAILTEL.NS", 
+        "RAIN.NS", "RAINBOW.NS", "RAMCOCEM.NS", "RCF.NS", "RATNAMANI.NS", "RAYMOND.NS", "RELIGARE.NS", "ROSSARI.NS", 
+        "ROUTE.NS", "SBFC.NS", "SJVN.NS", "SKFINDIA.NS", "SAFARI.NS", "SAPPHIRE.NS", "SARDAEN.NS", "SAREGAMA.NS", 
+        "SCHAEFFLER.NS", "SCHNEIDER.NS", "SCI.NS", "SHARDACROP.NS", "SHOPERSTOP.NS", "SHREERENUK.NS", "SHYAMMETL.NS", 
+        "SOBHA.NS", "SOLARINDS.NS", "SONATSOFTW.NS", "STARHEALTH.NS", "SWSOLAR.NS", "SUMICHEM.NS", "SPARC.NS", 
+        "SUNTV.NS", "SUNDARMFIN.NS", "SUNDRMFAST.NS", "SUNTECK.NS", "SUPRAJIT.NS", "SUPREMEIND.NS", "SUVENPHAR.NS", 
+        "SYRMA.NS", "TV18BRDCST.NS", "TANLA.NS", "TTML.NS", "TEJASNET.NS", "NIACL.NS", "RAMCOIND.NS", "THERMAX.NS", 
+        "THYROCARE.NS", "TIMKEN.NS", "TRIDENT.NS", "TRIVENI.NS", "TRITURBINE.NS", "UCOBANK.NS", "UTIAMC.NS", 
+        "VGUARD.NS", "VMART.NS", "VIPIND.NS", "VAIBHAVGBL.NS", "VTL.NS", "VARROC.NS", "MANYAVAR.NS", "VENKEYS.NS", 
+        "VIJAYA.NS", "VINATIORGA.NS", "WELCORP.NS", "WELSPUNLIV.NS", "WESTLIFE.NS", "WHIRLPOOL.NS", "WOCKPHARMA.NS", 
+        "ZENSARTECH.NS", "ZYDUSWELL.NS"
+    ]
+
+NIFTY_200 = get_nifty_200_tickers()
+NIFTY_500 = get_nifty_500_tickers()
 
 # Core Scanner Function
 @st.cache_data(ttl=60)
@@ -299,7 +385,15 @@ if selected_menu == "📈 Live Scanner":
         )
 
     with c3:
-        segment = st.radio("📜 Stock List Segment", ["NIFTY 50", "NIFTY 500"], horizontal=True)
+        segment = st.selectbox(
+            "📜 Select Stock Segment (Dropdown)",
+            [
+                f"NIFTY 50 ({len(NIFTY_50)} Stocks)",
+                f"NIFTY 200 ({len(NIFTY_200)} Stocks)",
+                f"NIFTY 500 ({len(NIFTY_500)} Stocks)"
+            ],
+            index=0
+        )
 
     tf_map = {
         "5m": ("5m", "5d"),
@@ -314,7 +408,14 @@ if selected_menu == "📈 Live Scanner":
         "1m": ("1mo", "5y")
     }
     interval, period = tf_map[timeframe]
-    stocks_to_scan = NIFTY_50 if segment == "NIFTY 50" else NIFTY_500
+
+    # Segment Routing Logic
+    if "NIFTY 50 " in segment:
+        stocks_to_scan = NIFTY_50
+    elif "NIFTY 200 " in segment:
+        stocks_to_scan = NIFTY_200
+    else:
+        stocks_to_scan = NIFTY_500
 
     with st.spinner(f"Scanning {len(stocks_to_scan)} stocks in {timeframe} timeframe..."):
         results = scan_bollinger(stocks_to_scan, interval, period, strategy, timeframe)
@@ -357,7 +458,7 @@ elif selected_menu == "⭐ Live Watchlist":
 elif selected_menu == "⚡ Intraday Stocks":
     st.subheader("⚡ Intraday Focus Stocks (High Liquidity & Volatility)")
     st.caption("Intraday trading-er jonno suitable high-volume stock scanning (15m timeframe):")
-    intraday_list = ["RELIANCE.NS", "TATAMOTORS.NS", "SBIN.NS", "ICICIBANK.NS", "AXISBANK.NS", "BAJFINANCE.NS"]
+    intraday_list = NIFTY_50[:20]
     results = scan_bollinger(intraday_list, "15m", "5d", "Condition 1: Lower Band Cut (Strong Green Candle & Engulfing/Reversal)", "15m")
     if results:
         st.dataframe(pd.DataFrame(results), use_container_width=True)
@@ -378,7 +479,7 @@ elif selected_menu == "📅 Short Term Stocks":
 elif selected_menu == "🏦 Long Term Stocks":
     st.subheader("🏦 Long Term Fundamental Wealth Creators")
     st.caption("Weekly timeframe-e deep value zone-e thaka stocks:")
-    results = scan_bollinger(NIFTY_50[:15], "1wk", "2y", "Condition 2: Completely Below Lower Band (Hammer / Morning Star Gap)", "1w")
+    results = scan_bollinger(NIFTY_50, "1wk", "2y", "Condition 2: Completely Below Lower Band (Hammer / Morning Star Gap)", "1w")
     if results:
         st.dataframe(pd.DataFrame(results), use_container_width=True)
     else:
