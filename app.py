@@ -58,7 +58,7 @@ with col_btn:
 
 st.markdown("---")
 
-# 1. Live Market Indices (Styled Small Boxes)
+# 1. Live Market Indices
 st.subheader("📊 Live Market Indices")
 
 @st.cache_data(ttl=30)
@@ -133,8 +133,8 @@ with c1:
     strategy = st.selectbox(
         "🎯 Select Condition / Strategy",
         [
-            "Condition 1: Lower Band Body Cut (Green Candle)",
-            "Condition 2: Completely Below Lower Band (No Touch / Gap)"
+            "Condition 1: Lower Band Cut (Strong Green Candle & Engulfing/Reversal)",
+            "Condition 2: Completely Below Lower Band (Hammer / Morning Star Gap)"
         ]
     )
 
@@ -162,7 +162,7 @@ tf_map = {
 }
 interval, period = tf_map[timeframe]
 
-# Complete NIFTY 50 Stock List
+# Stock Lists
 NIFTY_50 = [
     "RELIANCE.NS", "TCS.NS", "HDFCBANK.NS", "INFY.NS", "ICICIBANK.NS", "HINDUNILVR.NS", "ITC.NS", "SBIN.NS",
     "BHARTIARTL.NS", "LTIM.NS", "KOTAKBANK.NS", "LT.NS", "AXISBANK.NS", "HCLTECH.NS", "BAJFINANCE.NS",
@@ -173,7 +173,6 @@ NIFTY_50 = [
     "BRITANNIA.NS", "INDUSINDBK.NS", "HINDALCO.NS", "JSWSTEEL.NS", "APOLLOHOSP.NS", "UPL.NS"
 ]
 
-# Complete NIFTY 500 Stock List (Stored Directly)
 NIFTY_500 = [
     "3MINDIA.NS", "ABB.NS", "ACC.NS", "AAVAS.NS", "ABBOTINDIA.NS", "ABCAPITAL.NS", "ABFRL.NS", "ADANIENSOL.NS", 
     "ADANIENT.NS", "ADANIGREEN.NS", "ADANIPORTS.NS", "ADANIPOWER.NS", "ATGL.NS", "AWL.NS", "AEGISCHEM.NS", 
@@ -198,7 +197,7 @@ NIFTY_500 = [
     "GAIL.NS", "GALAXYSURF.NS", "GARFIBRES.NS", "GMDCLTD.NS", "GATEWAY.NS", "GLAND.NS", "GLAXO.NS", 
     "GLENMARK.NS", "MEDANTA.NS", "GMRAIRPORT.NS", "GOCLCORP.NS", "GODFRYPHLP.NS", "GODREJCP.NS", "GODREJIND.NS", 
     "GODREJPROP.NS", "GRANULES.NS", "GRAPHITE.NS", "GRASIM.NS", "GESHIP.NS", "GREAVESCOT.NS", "GRINDWELL.NS", 
-    "GUJGASLTD.NS", "GMDCLTD.NS", "GNFC.NS", "GPPL.NS", "GSFC.NS", "GSPL.NS", "HEG.NS", "HCLTECH.NS", 
+    "GUJGASLTD.NS", "GNFC.NS", "GPPL.NS", "GSFC.NS", "GSPL.NS", "HEG.NS", "HCLTECH.NS", 
     "HDFCAMC.NS", "HDFCBANK.NS", "HDFCLIFE.NS", "HFCL.NS", "HAPPSTMNDS.NS", "HAVELLS.NS", "HEROMOTOCO.NS", 
     "HIMATSEIDE.NS", "HINDCOPPER.NS", "HINDPETRO.NS", "HINDUNILVR.NS", "HINDZINC.NS", "POWERGRID.NS", 
     "HOMEFIRST.NS", "HONAUT.NS", "HUDCO.NS", "ICICIBANK.NS", "ICICIGI.NS", "ICICIPRULI.NS", "ISEC.NS", 
@@ -219,17 +218,17 @@ NIFTY_500 = [
     "NMDC.NS", "NTPC.NS", "NH.NS", "NUVAMA.NS", "NYKAA.NS", "OBEROIRLTY.NS", "ONGC.NS", "OIL.NS", "OLECTRA.NS", 
     "PAYTM.NS", "OFSS.NS", "ORIENTELEC.NS", "POLICYBZR.NS", "PCBL.NS", "PIIND.NS", "PNBHOUSING.NS", "PNCINFRA.NS", 
     "PVRINOX.NS", "PAGEIND.NS", "PATANJALI.NS", "PERSISTENT.NS", "PETRONET.NS", "PFC.NS", "PHOENIXLTD.NS", 
-    "PIDILITIND.NS", "PEL.NS", "PPLPHARMA.NS", "POLYMED.NS", "POLYCAB.NS", "POONAWALLA.NS", "PFC.NS", 
-    "POWERGRID.NS", "PRAJIND.NS", "PRESTIGE.NS", "PRINCEPIPE.NS", "PRSMJOHNSN.NS", "PGHL.NS", "PGHH.NS", 
-    "PNB.NS", "QUESS.NS", "RRKABEL.NS", "RBLBANK.NS", "REC.NS", "RITES.NS", "RADICO.NS", "RVNL.NS", "RAILTEL.NS", 
-    "RAIN.NS", "RAINBOW.NS", "RAMCOCEM.NS", "RCF.NS", "RATNAMANI.NS", "RAYMOND.NS", "RELIANCE.NS", "RELIGARE.NS", 
-    "RITES.NS", "ROSSARI.NS", "ROUTE.NS", "SBFC.NS", "SBICARD.NS", "SBILIFE.NS", "SJVN.NS", "SKFINDIA.NS", 
-    "SRF.NS", "SAFARI.NS", "MOTHERSON.NS", "SAPPHIRE.NS", "SARDAEN.NS", "SAREGAMA.NS", "SCHAEFFLER.NS", 
-    "SCHNEIDER.NS", "SCI.NS", "SHARDACROP.NS", "SNC.NS", "SHOPERSTOP.NS", "SHREERENUK.NS", "SHREECEM.NS", 
-    "SHRIRAMFIN.NS", "SHYAMMETL.NS", "SIEMENS.NS", "SOBHA.NS", "SOLARINDS.NS", "SONACOMS.NS", "SONATSOFTW.NS", 
-    "STARHEALTH.NS", "SBIN.NS", "SAIL.NS", "SWSOLAR.NS", "SUMICHEM.NS", "SPARC.NS", "SUNPHARMA.NS", "SUNTV.NS", 
-    "SUNDARMFIN.NS", "SUNDRMFAST.NS", "SUNTECK.NS", "SUPRAJIT.NS", "SUPREMEIND.NS", "SUVENPHAR.NS", "SUZLON.NS", 
-    "SYNGENE.NS", "SYRMA.NS", "TBOX.NS", "TV18BRDCST.NS", "TVSMOTOR.NS", "TANLA.NS", "TATACOMM.NS", "TATACONSUM.NS", 
+    "PIDILITIND.NS", "PEL.NS", "PPLPHARMA.NS", "POLYMED.NS", "POLYCAB.NS", "POONAWALLA.NS", "POWERGRID.NS", 
+    "PRAJIND.NS", "PRESTIGE.NS", "PRINCEPIPE.NS", "PRSMJOHNSN.NS", "PGHL.NS", "PGHH.NS", "PNB.NS", "QUESS.NS", 
+    "RRKABEL.NS", "RBLBANK.NS", "REC.NS", "RITES.NS", "RADICO.NS", "RVNL.NS", "RAILTEL.NS", "RAIN.NS", "RAINBOW.NS", 
+    "RAMCOCEM.NS", "RCF.NS", "RATNAMANI.NS", "RAYMOND.NS", "RELIANCE.NS", "RELIGARE.NS", "ROSSARI.NS", 
+    "ROUTE.NS", "SBFC.NS", "SBICARD.NS", "SBILIFE.NS", "SJVN.NS", "SKFINDIA.NS", "SRF.NS", "SAFARI.NS", 
+    "MOTHERSON.NS", "SAPPHIRE.NS", "SARDAEN.NS", "SAREGAMA.NS", "SCHAEFFLER.NS", "SCHNEIDER.NS", "SCI.NS", 
+    "SHARDACROP.NS", "SNC.NS", "SHOPERSTOP.NS", "SHREERENUK.NS", "SHREECEM.NS", "SHRIRAMFIN.NS", "SHYAMMETL.NS", 
+    "SIEMENS.NS", "SOBHA.NS", "SOLARINDS.NS", "SONACOMS.NS", "SONATSOFTW.NS", "STARHEALTH.NS", "SBIN.NS", 
+    "SAIL.NS", "SWSOLAR.NS", "SUMICHEM.NS", "SPARC.NS", "SUNPHARMA.NS", "SUNTV.NS", "SUNDARMFIN.NS", 
+    "SUNDRMFAST.NS", "SUNTECK.NS", "SUPRAJIT.NS", "SUPREMEIND.NS", "SUVENPHAR.NS", "SUZLON.NS", "SYNGENE.NS", 
+    "SYRMA.NS", "TBOX.NS", "TV18BRDCST.NS", "TVSMOTOR.NS", "TANLA.NS", "TATACOMM.NS", "TATACONSUM.NS", 
     "TATAELXSI.NS", "TATAMTRDVR.NS", "TATAMOTORS.NS", "TATAPOWER.NS", "TATASTEEL.NS", "TATATECH.NS", "TTML.NS", 
     "TCS.NS", "TECHM.NS", "TEJASNET.NS", "NIACL.NS", "RAMCOIND.NS", "THERMAX.NS", "THYROCARE.NS", "TIINDIA.NS", 
     "TIMKEN.NS", "TITAN.NS", "TORNTPHARM.NS", "TORNTPOWER.NS", "TRENT.NS", "TRIDENT.NS", "TRIVENI.NS", 
@@ -261,16 +260,16 @@ def scan_bollinger(stocks, interval, period, strategy_type, tf_name):
             else:
                 continue
 
-            if len(df) < 20:
+            if len(df) < 21:
                 continue
 
-            # Resample for 2h and 4h if timeframe is selected
+            # Resample for 2h and 4h
             if tf_name == "2h":
                 df = df.resample('2h').agg({'Open':'first', 'High':'max', 'Low':'min', 'Close':'last', 'Volume':'sum'}).dropna()
             elif tf_name == "4h":
                 df = df.resample('4h').agg({'Open':'first', 'High':'max', 'Low':'min', 'Close':'last', 'Volume':'sum'}).dropna()
 
-            if len(df) < 20:
+            if len(df) < 21:
                 continue
 
             # Calculate Bollinger Bands
@@ -278,35 +277,58 @@ def scan_bollinger(stocks, interval, period, strategy_type, tf_name):
             df['STD20'] = df['Close'].rolling(window=20).std()
             df['Lower_Band'] = df['SMA20'] - (df['STD20'] * 2)
 
-            candle = df.iloc[-1]
+            curr = df.iloc[-1]
+            prev = df.iloc[-2]
 
-            if strategy_type == "Condition 1: Lower Band Body Cut (Green Candle)":
-                is_green = candle['Close'] > candle['Open']
-                open_below = candle['Open'] < candle['Lower_Band']
-                close_above = candle['Close'] > candle['Lower_Band']
+            body_curr = abs(curr['Close'] - curr['Open'])
+            range_curr = curr['High'] - curr['Low']
 
-                if is_green and open_below and close_above:
+            if strategy_type == "Condition 1: Lower Band Cut (Strong Green Candle & Engulfing/Reversal)":
+                is_green = curr['Close'] > curr['Open']
+                
+                # Lower band cut condition (Low or Open touches/cuts lower band)
+                cuts_lower = curr['Low'] <= curr['Lower_Band'] and curr['Close'] >= curr['Lower_Band']
+                
+                # Bullish Engulfing or Piercing: Current close/high equals or exceeds previous candle's high/open
+                bullish_engulfing = (curr['Close'] >= prev['Open']) or (curr['Close'] >= prev['High'] * 0.98)
+                
+                # Strong body relative to range (small shadows allowed)
+                strong_body = (body_curr / range_curr) > 0.50 if range_curr > 0 else False
+
+                if is_green and cuts_lower and bullish_engulfing and strong_body:
                     selected.append({
                         "Stock": symbol.replace(".NS", ""),
-                        "LTP (₹)": round(candle['Close'], 2),
-                        "Open (₹)": round(candle['Open'], 2),
-                        "High (₹)": round(candle['High'], 2),
-                        "Lower Band (₹)": round(candle['Lower_Band'], 2),
-                        "Volume": int(candle['Volume'])
+                        "LTP (₹)": round(curr['Close'], 2),
+                        "Open (₹)": round(curr['Open'], 2),
+                        "High (₹)": round(curr['High'], 2),
+                        "Lower Band (₹)": round(curr['Lower_Band'], 2),
+                        "Pattern": "Strong Green Cut",
+                        "Volume": int(curr['Volume'])
                     })
 
-            elif strategy_type == "Condition 2: Completely Below Lower Band (No Touch / Gap)":
-                # High is strictly less than Lower Band (No touch)
-                completely_below = candle['High'] < candle['Lower_Band']
+            elif strategy_type == "Condition 2: Completely Below Lower Band (Hammer / Morning Star Gap)":
+                # High is strictly less than or equal to Lower Band (No Touch / Gap below)
+                below_lower = curr['High'] <= curr['Lower_Band']
+                
+                # Hammer Pattern Logic: Long lower shadow, small upper shadow/body
+                lower_shadow = min(curr['Open'], curr['Close']) - curr['Low']
+                upper_shadow = curr['High'] - max(curr['Open'], curr['Close'])
+                
+                is_hammer = (lower_shadow >= 2 * body_curr) and (upper_shadow <= body_curr * 1.2) if body_curr > 0 else (lower_shadow > 0)
+                
+                # Small Body / Morning Star base candle
+                is_small_body = (body_curr / range_curr) < 0.35 if range_curr > 0 else True
 
-                if completely_below:
+                if below_lower and (is_hammer or is_small_body):
+                    pattern_type = "Hammer Below Band" if is_hammer else "Gap / Morning Star Base"
                     selected.append({
                         "Stock": symbol.replace(".NS", ""),
-                        "LTP (₹)": round(candle['Close'], 2),
-                        "High (₹)": round(candle['High'], 2),
-                        "Low (₹)": round(candle['Low'], 2),
-                        "Lower Band (₹)": round(candle['Lower_Band'], 2),
-                        "Volume": int(candle['Volume'])
+                        "LTP (₹)": round(curr['Close'], 2),
+                        "High (₹)": round(curr['High'], 2),
+                        "Low (₹)": round(curr['Low'], 2),
+                        "Lower Band (₹)": round(curr['Lower_Band'], 2),
+                        "Pattern": pattern_type,
+                        "Volume": int(curr['Volume'])
                     })
         except Exception:
             continue
