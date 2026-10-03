@@ -4,6 +4,7 @@ import yfinance as yf
 import pandas as pd
 from datetime import datetime
 import pytz
+import requests
 
 # Page Configuration
 st.set_page_config(page_title="Stockview12 - Bollinger Band Live Scanner", layout="wide")
@@ -170,6 +171,7 @@ selected_menu = st.radio(
 
 st.markdown("---")
 
+# Base NIFTY 50 Tickers
 NIFTY_50 = [
     "ADANIENT.NS", "ADANIPORTS.NS", "APOLLOHOSP.NS", "ASIANPAINT.NS", "AXISBANK.NS",
     "BAJAJ-AUTO.NS", "BAJFINANCE.NS", "BAJAJFINSV.NS", "BEL.NS", "BPCL.NS",
@@ -185,25 +187,64 @@ NIFTY_50 = [
 
 @st.cache_data(ttl=86400)
 def get_nifty_200_tickers():
+    headers = {'User-Agent': 'Mozilla/5.0'}
     try:
         url = "https://archives.nseindia.com/content/indices/ind_nifty200list.csv"
-        df = pd.read_csv(url)
-        tickers = [f"{symbol}.NS" for symbol in df['Symbol'].tolist()]
-        if len(tickers) >= 180:
-            return tickers
+        res = requests.get(url, headers=headers, timeout=5)
+        if res.status_code == 200:
+            df = pd.read_csv(requests.get(url, headers=headers, timeout=5).content)
+            symbols = df['Symbol'].tolist()
+            clean_symbols = ['HEG' if s == 'HEGAM' else s for s in symbols]
+            tickers = [f"{s}.NS" for s in clean_symbols if s != "HEGAM"]
+            if len(tickers) >= 150:
+                return list(set(tickers))
     except Exception:
         pass
     
-    return NIFTY_50
+    # Extended Static Fallback
+    extended_next = [
+        "ABB.NS", "ACC.NS", "AUBANK.NS", "ABBOTINDIA.NS", "ABCAPITAL.NS", "ABFRL.NS", 
+        "ADANIENSOL.NS", "ADANIGREEN.NS", "ADANIPOWER.NS", "ATGL.NS", "AWL.NS", "ALKEM.NS", 
+        "AMBUJACEM.NS", "APOLLOTYRE.NS", "ASHOKLEY.NS", "ASTRAL.NS", "AUROPHARMA.NS", 
+        "BALKRISIND.NS", "BANDHANBNK.NS", "BANKBARODA.NS", "BANKINDIA.NS", "BERGEPAINT.NS", 
+        "BDL.NS", "BHARATFORG.NS", "BHEL.NS", "BIOCON.NS", "BOSCHLTD.NS", "CANBK.NS", 
+        "CGPOWER.NS", "CHOLAFIN.NS", "COFORGE.NS", "COLPAL.NS", "CONCOR.NS", "CROMPTON.NS", 
+        "CUMMINSIND.NS", "DABUR.NS", "DALBHARAT.NS", "DEEPAKNTR.NS", "DELHIVERY.NS", 
+        "DIXON.NS", "DLF.NS", "ESCORTS.NS", "EXIDEIND.NS", "FEDERALBNK.NS", "GAIL.NS", 
+        "GLAND.NS", "GLENMARK.NS", "GMRAIRPORT.NS", "GODREJCP.NS", "GODREJPROP.NS", 
+        "GUJGASLTD.NS", "HDFCAMC.NS", "HAVELLS.NS", "HINDPETRO.NS", "HINDZINC.NS", 
+        "ICICIGI.NS", "ICICIPRULI.NS", "IDFCFIRSTB.NS", "INDIAMART.NS", "INDIANB.NS", 
+        "IEX.NS", "INDHOTEL.NS", "IOC.NS", "IRCTC.NS", "IRFC.NS", "IGL.NS", "INDUSTOWER.NS", 
+        "NAUKRI.NS", "INDIGO.NS", "IPCALAB.NS", "JSWENERGY.NS", "JINDALSTEL.NS", "JIOFIN.NS", 
+        "JUBLFOOD.NS", "KPITTECH.NS", "KAJARIACER.NS", "KALYANKJIL.NS", "KEI.NS", "LTF.NS", 
+        "LTTS.NS", "LICHSGFIN.NS", "LICI.NS", "LUPIN.NS", "MRF.NS", "LODHA.NS", "M&MFIN.NS", 
+        "MANAPPURAM.NS", "MARICO.NS", "MAXHEALTH.NS", "MAZDOCK.NS", "MPHASIS.NS", 
+        "MUTHOOTFIN.NS", "NATIONALUM.NS", "NAVINFLUOR.NS", "NHPC.NS", "NMDC.NS", "NYKAA.NS", 
+        "OBEROIRLTY.NS", "OIL.NS", "PAYTM.NS", "OFSS.NS", "POLICYBZR.NS", "PIIND.NS", 
+        "PNBHOUSING.NS", "PAGEIND.NS", "PATANJALI.NS", "PERSISTENT.NS", "PETRONET.NS", 
+        "PFC.NS", "PHOENIXLTD.NS", "PIDILITIND.NS", "POLYCAB.NS", "POONAWALLA.NS", 
+        "PRESTIGE.NS", "PNB.NS", "REC.NS", "RVNL.NS", "MOTHERSON.NS", "SAIL.NS", "SHREECEM.NS", 
+        "SIEMENS.NS", "SONACOMS.NS", "SRF.NS", "SBICARD.NS", "SUZLON.NS", "SYNGENE.NS", 
+        "TVSMOTOR.NS", "TATACOMM.NS", "TATAELXSI.NS", "TATAPOWER.NS", "TATATECH.NS", 
+        "TIINDIA.NS", "TORNTPHARM.NS", "TORNTPOWER.NS", "TRENT.NS", "UNOMINDA.NS", "UPL.NS", 
+        "UNIONBANK.NS", "UBL.NS", "MCDOWELL-N.NS", "VBL.NS", "VEDL.NS", "IDEA.NS", 
+        "VOLTAS.NS", "WIPRO.NS", "YESBANK.NS", "ZEEL.NS", "ZOMATO.NS", "ZYDUSLIFE.NS", "HEG.NS"
+    ]
+    return list(set(NIFTY_50 + extended_next))
 
 @st.cache_data(ttl=86400)
 def get_nifty_500_tickers():
+    headers = {'User-Agent': 'Mozilla/5.0'}
     try:
         url = "https://archives.nseindia.com/content/indices/ind_nifty500list.csv"
-        df = pd.read_csv(url)
-        tickers = [f"{symbol}.NS" for symbol in df['Symbol'].tolist()]
-        if len(tickers) >= 450:
-            return tickers
+        res = requests.get(url, headers=headers, timeout=5)
+        if res.status_code == 200:
+            df = pd.read_csv(res.content)
+            symbols = df['Symbol'].tolist()
+            clean_symbols = ['HEG' if s == 'HEGAM' else s for s in symbols]
+            tickers = [f"{s}.NS" for s in clean_symbols if s != "HEGAM"]
+            if len(tickers) >= 400:
+                return list(set(tickers))
     except Exception:
         pass
     
@@ -212,7 +253,7 @@ def get_nifty_500_tickers():
 NIFTY_200 = get_nifty_200_tickers()
 NIFTY_500 = get_nifty_500_tickers()
 
-# Core Scanner Function (No caching for scan calculations to prevent cross-timeframe state contamination)
+# Core Scanner Function
 def scan_bollinger(stocks, interval, period, strategy_type, tf_name):
     selected = []
     if not stocks:
@@ -225,12 +266,19 @@ def scan_bollinger(stocks, interval, period, strategy_type, tf_name):
 
     for symbol in stocks:
         try:
+            # Exclude incorrect HEGAM ticker completely
+            if "HEGAM" in symbol:
+                continue
+
             if symbol in data:
                 df = data[symbol].dropna()
             else:
                 continue
 
-            # Resampling Handling for custom timeframe options
+            if len(df) < 21:
+                continue
+
+            # Resampling Handling
             if tf_name == "10-Min":
                 df = df.resample('10min').agg({'Open':'first', 'High':'max', 'Low':'min', 'Close':'last', 'Volume':'sum'}).dropna()
             elif tf_name == "2-Hour":
@@ -269,7 +317,6 @@ def scan_bollinger(stocks, interval, period, strategy_type, tf_name):
                     })
 
             elif strategy_type == "Condition 2: Completely Below Lower Band (Hammer / Morning Star Gap)":
-                # Strict Rule: High & Low both below Lower Band
                 below_lower = (curr['High'] < curr['Lower_Band']) and (curr['Low'] < curr['Lower_Band'])
                 
                 lower_shadow = min(curr['Open'], curr['Close']) - curr['Low']
