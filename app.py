@@ -340,14 +340,16 @@ def scan_bollinger(stocks, interval, period, strategy_type, tf_name):
                     })
 
             elif strategy_type == "Condition 2: Completely Below Lower Band (Hammer / Morning Star Gap)":
-                below_lower = curr['High'] <= curr['Lower_Band']
+                # Strict Verification: The entire High price must be below Lower Band
+                below_lower = (curr['High'] < curr['Lower_Band']) and (curr['Low'] < curr['Lower_Band'])
+                
                 lower_shadow = min(curr['Open'], curr['Close']) - curr['Low']
                 upper_shadow = curr['High'] - max(curr['Open'], curr['Close'])
                 
-                is_hammer = (lower_shadow >= 2 * body_curr) and (upper_shadow <= body_curr * 1.2) if body_curr > 0 else (lower_shadow > 0)
-                is_small_body = (body_curr / range_curr) < 0.35 if range_curr > 0 else True
+                is_hammer = (lower_shadow >= 2 * body_curr) and (upper_shadow <= body_curr * 0.8) if body_curr > 0 else (lower_shadow > 0)
+                is_star_body = (body_curr / range_curr) <= 0.30 if range_curr > 0 else True
 
-                if below_lower and (is_hammer or is_small_body):
+                if below_lower and (is_hammer or is_star_body):
                     pattern_type = "Hammer Below Band" if is_hammer else "Gap / Morning Star Base"
                     selected.append({
                         "Stock": symbol.replace(".NS", ""),
