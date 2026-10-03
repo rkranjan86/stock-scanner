@@ -240,7 +240,7 @@ NIFTY_500 = [
     "ITC.NS", "INDUSINDBK.NS", "INFY.NS", "JSWSTEEL.NS", "KOTAKBANK.NS",
     "LT.NS", "LTIM.NS", "M&M.NS", "MARUTI.NS", "NTPC.NS",
     "NESTLEIND.NS", "ONGC.NS", "POWERGRID.NS", "RELIANCE.NS", "SBILIFE.NS",
-    "SHRIRAMFIN.NS", "SBIN.NS", "SUNPHARMA.NS", "TATACONSUM.NS", "TCS.NS",
+    "SHRIRAMFIN.NS", "SBIN.NS", "SUNPHARMA.NS", "TCS.NS", "TATACONSUM.NS",
     "TATAMOTORS.NS", "TATASTEEL.NS", "TECHM.NS", "TITAN.NS", "ULTRACEMCO.NS",
     "ABB.NS", "ACC.NS", "AUBANK.NS", "ABBOTINDIA.NS", "ABCAPITAL.NS", "ABFRL.NS", 
     "ADANIENSOL.NS", "ADANIGREEN.NS", "ADANIPOWER.NS", "ATGL.NS", "AWL.NS", "ALKEM.NS", 
@@ -320,15 +320,6 @@ NIFTY_500 = [
     "SANGHVIMOV.NS", "TIPSINDLTD.NS", "VIPULLTD.NS", "ZOTA.NS"
 ]
 
-# ==========================================
-# 📌 4. OTHER POPULAR STOCKS (Outside Nifty 500)
-# ==========================================
-OTHER_STOCKS = [
-    "ALOKINDS.NS", "BCG.NS", "EXICOM.NS", "IEX.NS", "IREDA.NS", "JPPOWER.NS",
-    "LLOYDSENGG.NS", "NHPC.NS", "SJVN.NS", "SOUTHBANK.NS", "YESBANK.NS", "URJA.NS",
-    "HUDCO.NS", "RPOWER.NS", "INFIBEAM.NS", "TRIDENT.NS", "SUZLON.NS"
-]
-
 # Core Scanner Function
 def scan_bollinger(stocks, interval, period, strategy_type, tf_name):
     selected = []
@@ -342,7 +333,12 @@ def scan_bollinger(stocks, interval, period, strategy_type, tf_name):
 
     for symbol in stocks:
         try:
-            if symbol in data:
+            if "HEGAM" in symbol:
+                continue
+
+            if len(stocks) == 1:
+                df = data.dropna()
+            elif symbol in data:
                 df = data[symbol].dropna()
             else:
                 continue
@@ -370,6 +366,9 @@ def scan_bollinger(stocks, interval, period, strategy_type, tf_name):
             body_curr = abs(curr['Close'] - curr['Open'])
             range_curr = curr['High'] - curr['Low']
 
+            clean_symbol = symbol.replace(".NS", "").replace(".BO", "")
+            exchange = "BSE" if ".BO" in symbol else "NSE"
+
             if strategy_type == "Condition 1: Lower Band Cut (Strong Green Candle & Engulfing/Reversal)":
                 is_green = curr['Close'] > curr['Open']
                 cuts_lower = curr['Low'] <= curr['Lower_Band'] and curr['Close'] >= curr['Lower_Band']
@@ -378,7 +377,8 @@ def scan_bollinger(stocks, interval, period, strategy_type, tf_name):
 
                 if is_green and cuts_lower and bullish_engulfing and strong_body:
                     selected.append({
-                        "Stock": symbol.replace(".NS", ""),
+                        "Stock": clean_symbol,
+                        "Exchange": exchange,
                         "LTP (₹)": round(curr['Close'], 2),
                         "Open (₹)": round(curr['Open'], 2),
                         "High (₹)": round(curr['High'], 2),
@@ -399,7 +399,8 @@ def scan_bollinger(stocks, interval, period, strategy_type, tf_name):
                 if below_lower and (is_hammer or is_star_body):
                     pattern_type = "Hammer Below Band" if is_hammer else "Gap / Morning Star Base"
                     selected.append({
-                        "Stock": symbol.replace(".NS", ""),
+                        "Stock": clean_symbol,
+                        "Exchange": exchange,
                         "LTP (₹)": round(curr['Close'], 2),
                         "High (₹)": round(curr['High'], 2),
                         "Low (₹)": round(curr['Low'], 2),
@@ -440,8 +441,7 @@ if selected_menu == "📈 Live Scanner":
                 f"NIFTY 50 ({len(NIFTY_50)} Stocks)",
                 f"NIFTY 200 ({len(NIFTY_200)} Stocks)",
                 f"NIFTY 500 ({len(NIFTY_500)} Stocks)",
-                f"Other Popular Stocks ({len(OTHER_STOCKS)} Stocks)",
-                "🔍 Custom Search (Type Any NSE Stock Symbol)"
+                "🌐 Other Stock View (BSE / SmallCap / Custom Tickers)"
             ],
             index=0
         )
@@ -469,12 +469,22 @@ if selected_menu == "📈 Live Scanner":
         stocks_to_scan = NIFTY_200
     elif "NIFTY 500 " in segment:
         stocks_to_scan = NIFTY_500
-    elif "Other Popular" in segment:
-        stocks_to_scan = OTHER_STOCKS
-    elif "Custom Search" in segment:
-        user_input = st.text_input("NSE Stock Symbol Type Korun (Comma Separated):", "IREDA, SJVN, BCPL, IEX, RVNL")
-        if user_input:
-            stocks_to_scan = [s.strip().upper() + ".NS" for s in user_input.split(",") if s.strip()]
+    elif "Other Stock View" in segment:
+        st.markdown("#### 🔍 BSE & Custom Stock Search Portal")
+        custom_input = st.text_input(
+            "Stock Symbols or BSE Codes Enter Korun (Comma Separated, e.g., 500325.BO, SJVN.BO, IREDA, URJA.BO, RPOWER):",
+            "500325.BO, SJVN.BO, IREDA, URJA.BO, RPOWER"
+        )
+        if custom_input:
+            formatted_list = []
+            for item in custom_input.split(","):
+                sym = item.strip().upper()
+                if not sym:
+                    continue
+                if not (sym.endswith(".NS") or sym.endswith(".BO")):
+                    sym = sym + ".NS"
+                formatted_list.append(sym)
+            stocks_to_scan = formatted_list
 
     if stocks_to_scan:
         with st.spinner(f"Scanning {len(stocks_to_scan)} stocks in {timeframe} timeframe..."):
@@ -488,10 +498,18 @@ if selected_menu == "📈 Live Scanner":
 
 elif selected_menu == "⭐ Live Watchlist":
     st.subheader("⭐ Custom Live Watchlist")
-    user_symbols = st.text_input("Stock Symbols Type Korun (Comma Separated):", "RELIANCE, SBIN, TATAMOTORS, INFY, HDFCBANK")
+    user_symbols = st.text_input("Stock Symbols Type Korun (Comma Separated, e.g., RELIANCE, SBIN, 500325.BO):", "RELIANCE, SBIN, TATAMOTORS, INFY, HDFCBANK")
     
     if user_symbols:
-        symbol_list = [s.strip().upper() + ".NS" for s in user_symbols.split(",") if s.strip()]
+        symbol_list = []
+        for item in user_symbols.split(","):
+            s = item.strip().upper()
+            if not s:
+                continue
+            if not (s.endswith(".NS") or s.endswith(".BO")):
+                s = s + ".NS"
+            symbol_list.append(s)
+
         watchlist_data = []
         for sym in symbol_list:
             try:
@@ -502,7 +520,8 @@ elif selected_menu == "⭐ Live Watchlist":
                 chg = p - pc
                 pct = (chg / pc) * 100
                 watchlist_data.append({
-                    "Stock Symbol": sym.replace(".NS", ""),
+                    "Stock Symbol": sym.replace(".NS", "").replace(".BO", ""),
+                    "Exchange": "BSE" if ".BO" in sym else "NSE",
                     "LTP (₹)": round(p, 2),
                     "Change (₹)": round(chg, 2),
                     "Change (%)": f"{pct:+.2f}%",
