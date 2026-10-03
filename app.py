@@ -141,7 +141,7 @@ with c1:
 with c2:
     timeframe = st.selectbox(
         "⏱️ Select Timeframe",
-        ["5m", "15m", "30m", "1h", "2h", "4h", "1d"],
+        ["5m", "15m", "30m", "1h", "2h", "4h", "1d", "1w", "1m"],
         index=6
     )
 
@@ -156,7 +156,9 @@ tf_map = {
     "1h": ("60m", "1mo"),
     "2h": ("60m", "1mo"),
     "4h": ("60m", "3mo"),
-    "1d": ("1d", "3mo")
+    "1d": ("1d", "6mo"),
+    "1w": ("1wk", "2y"),
+    "1m": ("1mo", "5y")
 }
 interval, period = tf_map[timeframe]
 
