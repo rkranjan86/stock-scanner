@@ -1,3 +1,5 @@
 streamlit
+indian-stock-market
 yfinance
 pandas
+numpy
