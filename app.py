@@ -98,34 +98,18 @@ st.markdown("""
 # ⏰ MARKET HOURS LOGIC
 # =========================================================
 def get_market_status():
-    """
-    ভারতীয় স্টক মার্কেট (NSE/BSE) ওপেন কিনা চেক করে।
-    Pre-market: 9:00 AM - 9:15 AM IST
-    Live: 9:15 AM - 3:30 PM IST
-    সোমবার - শুক্রবার
-    """
     now = datetime.now(IST)
     weekday = now.weekday()  # 0=Monday, 6=Sunday
 
-    # NSE ছুটির দিন (প্রয়োজন অনুযায়ী আপডেট করুন)
     NSE_HOLIDAYS = [
-        "2026-01-26",  # Republic Day
-        "2026-03-04",  # Holi
-        "2026-03-17",  # Eid-ul-Fitr (আনুমানিক)
-        "2026-03-30",  # Ram Navami
-        "2026-04-03",  # Mahavir Jayanti
-        "2026-04-14",  # Ambedkar Jayanti
-        "2026-05-01",  # Maharashtra Day
-        "2026-08-15",  # Independence Day
-        "2026-10-02",  # Gandhi Jayanti
-        "2026-10-21",  # Dussehra
-        "2026-10-22",  # Dussehra (২য় দিন)
-        "2026-11-05",  # Diwali (আনুমানিক)
-        "2026-12-25",  # Christmas
+        "2026-01-26", "2026-03-04", "2026-03-17", "2026-03-30",
+        "2026-04-03", "2026-04-14", "2026-05-01", "2026-08-15",
+        "2026-10-02", "2026-10-21", "2026-10-22", "2026-11-05",
+        "2026-12-25",
     ]
     today_str = now.strftime("%Y-%m-%d")
 
-    if weekday >= 5:  # শনি বা রবিবার
+    if weekday >= 5:
         return "closed", "Weekend"
     if today_str in NSE_HOLIDAYS:
         return "closed", "Holiday"
@@ -141,7 +125,6 @@ def get_market_status():
         return "open", "Live"
     else:
         return "closed", "After Hours"
-
 
 # =========================================================
 # 🏷️ HEADER
@@ -294,7 +277,7 @@ selected_menu = st.radio(
 st.markdown("---")
 
 # =========================================================
-# 📊 STOCK UNIVERSE
+# 📊 STOCK UNIVERSE (Compact Version to save space)
 # =========================================================
 NIFTY_50 = [
     "ADANIENT.NS", "ADANIPORTS.NS", "APOLLOHOSP.NS", "ASIANPAINT.NS", "AXISBANK.NS",
@@ -387,9 +370,6 @@ NIFTY_500 = NIFTY_200 + [
 # 🎯 CORE SCANNER FUNCTION
 # =========================================================
 def scan_bollinger(stocks, interval, period, strategy_type, tf_name):
-    """
-    মার্কেট ওপেন থাকলে লাইভ ডেটা, বন্ধ থাকলে শেষ ক্লোজিং ডেটা স্ক্যান করে।
-    """
     selected = []
     if not stocks:
         return selected
@@ -427,7 +407,6 @@ def scan_bollinger(stocks, interval, period, strategy_type, tf_name):
             if len(df) < 21:
                 continue
 
-            # Custom resampling
             if tf_name == "10-Min":
                 df = df.resample('10min').agg({'Open':'first', 'High':'max', 'Low':'min', 'Close':'last', 'Volume':'sum'}).dropna()
             elif tf_name == "2-Hour":
@@ -452,7 +431,6 @@ def scan_bollinger(stocks, interval, period, strategy_type, tf_name):
             exchange = "BSE" if ".BO" in symbol else "NSE"
             status_tag = "🟢 LIVE" if is_market_live else "🔴 CLOSED"
 
-            # Condition 1
             if strategy_type.startswith("Condition 1"):
                 is_green = curr['Close'] > curr['Open']
                 cuts_lower = curr['Low'] <= curr['Lower_Band'] and curr['Close'] >= curr['Lower_Band']
@@ -472,7 +450,6 @@ def scan_bollinger(stocks, interval, period, strategy_type, tf_name):
                         "Volume": int(curr['Volume']) if not pd.isna(curr['Volume']) else 0
                     })
 
-            # Condition 2
             elif strategy_type.startswith("Condition 2"):
                 below_lower = (curr['High'] < curr['Lower_Band']) and (curr['Low'] < curr['Lower_Band'])
                 lower_shadow = min(curr['Open'], curr['Close']) - curr['Low']
@@ -593,4 +570,110 @@ elif selected_menu == "⭐ Live Watchlist":
     user_symbols = st.text_input(
         "Stock Symbols (Comma Separated, e.g., RELIANCE, SBIN, 500325.BO):",
         "RELIANCE, SBIN, TATAMOTORS, INFY, HDFCBANK"
-   
+    )
+
+    if user_symbols:
+        symbol_list = []
+        for item in user_symbols.split(","):
+            s = item.strip().upper()
+            if not s:
+                continue
+            if not (s.endswith(".NS") or s.endswith(".BO")):
+                s = s + ".NS"
+            symbol_list.append(s)
+
+        watchlist_data = []
+        market_status, _ = get_market_status()
+        is_market_live = (market_status == "open")
+        status_tag = "🟢 LIVE" if is_market_live else "🔴 CLOSED"
+
+        for sym in symbol_list:
+            try:
+                t = yf.Ticker(sym)
+                info = t.fast_info
+                p = info.last_price
+                pc = info.previous_close
+                if p is None or pc is None:
+                    continue
+                chg = p - pc
+                pct = (chg / pc) * 100
+                watchlist_data.append({
+                    "Stock Symbol": sym.replace(".NS", "").replace(".BO", ""),
+                    "Exchange": "BSE" if ".BO" in sym else "NSE",
+                    "Status": status_tag,
+                    "LTP (₹)": round(p, 2),
+                    "Change (₹)": round(chg, 2),
+                    "Change (%)": f"{pct:+.2f}%",
+                    "Prev Close (₹)": round(pc, 2)
+                })
+            except Exception:
+                continue
+
+        if watchlist_data:
+            st.dataframe(pd.DataFrame(watchlist_data), use_container_width=True)
+        else:
+            st.warning("কোনো ডেটা পাওয়া যায়নি। Symbol সঠিক কিনা চেক করুন।")
+
+
+# =========================================================
+# ⚡ PAGE 3: INTRADAY STOCKS
+# =========================================================
+elif selected_menu == "⚡ Intraday Stocks":
+    st.subheader("⚡ Intraday Focus Stocks (High Liquidity)")
+    st.caption("15-Min timeframe-এ Condition 1 স্ক্যান করা হচ্ছে:")
+    intraday_list = NIFTY_50
+    results = scan_bollinger(
+        intraday_list, "15m", "5d",
+        "Condition 1: Lower Band Cut (Strong Green Candle & Engulfing/Reversal)",
+        "15-Min"
+    )
+    if results:
+        st.dataframe(pd.DataFrame(results), use_container_width=True)
+    else:
+        st.info("Current 15-Min timeframe-এ কোনো Intraday setup তৈরি হয়নি।")
+
+
+# =========================================================
+# 📅 PAGE 4: SHORT TERM STOCKS
+# =========================================================
+elif selected_menu == "📅 Short Term Stocks":
+    st.subheader("📅 Short Term / Swing Trading Stocks")
+    st.caption("Daily timeframe-এ reversal pattern স্ক্যান করা হচ্ছে:")
+    results = scan_bollinger(
+        NIFTY_50, "1d", "6mo",
+        "Condition 1: Lower Band Cut (Strong Green Candle & Engulfing/Reversal)",
+        "1-Day"
+    )
+    if results:
+        st.dataframe(pd.DataFrame(results), use_container_width=True)
+    else:
+        st.info("Daily timeframe-এ কোনো Short-term setup পাওয়া যায়নি।")
+
+
+# =========================================================
+# 🏦 PAGE 5: LONG TERM STOCKS
+# =========================================================
+elif selected_menu == "🏦 Long Term Stocks":
+    st.subheader("🏦 Long Term Fundamental Wealth Creators")
+    st.caption("Weekly timeframe-এ deep value zone স্ক্যান করা হচ্ছে:")
+    results = scan_bollinger(
+        NIFTY_50, "1wk", "2y",
+        "Condition 2: Completely Below Lower Band (Hammer / Morning Star Gap)",
+        "1-Week"
+    )
+    if results:
+        st.dataframe(pd.DataFrame(results), use_container_width=True)
+    else:
+        st.info("Weekly timeframe-এ কোনো Long-term value setup পাওয়া যায়নি।")
+
+
+# =========================================================
+# ⚠️ DISCLAIMER
+# =========================================================
+st.markdown("""
+    <div class="disclaimer-box">
+        ⚠️ <b>সতর্কতা ও ডিসক্লেইমার:</b> এখানে কোনো শেয়ার কেনা বা বেচার পরামর্শ দেওয়া হয় না। 
+        এই পোর্টালটি সম্পূর্ণ শিক্ষার উদ্দেশ্যে (Educational Purpose) প্রণীত। 
+        বিনিয়োগের আগে নিজে বিশ্লেষণ করুন এবং একজন আর্থিক উপদেষ্টার পরামর্শ নিন।
+    </div>
+""", unsafe_allow_html=True)
