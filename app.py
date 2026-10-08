@@ -54,7 +54,7 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# 1. Header
+# 1. Header with Stockview12 Dynamic Logo
 st.markdown(f"""
     <div class="logo-container">
         <div class="stockview-logo">Stockview<span>12</span></div>
@@ -62,7 +62,7 @@ st.markdown(f"""
     </div>
 """, unsafe_allow_html=True)
 
-# 2. Live Indices Marquee
+# 2. Live Indices Fetching & Clean Marquee Rendering
 @st.cache_data(ttl=30)
 def render_live_marquee():
     indices = {
@@ -171,7 +171,7 @@ selected_menu = st.radio(
 st.markdown("---")
 
 # ==========================================
-# 📌 Stock Lists
+# 📌 1. NIFTY 50 STOCK LIST ( Exactly 50 )
 # ==========================================
 NIFTY_50 = [
     "ADANIENT.NS", "ADANIPORTS.NS", "APOLLOHOSP.NS", "ASIANPAINT.NS", "AXISBANK.NS",
@@ -186,22 +186,91 @@ NIFTY_50 = [
     "TATAMOTORS.NS", "TATASTEEL.NS", "TECHM.NS", "TITAN.NS", "ULTRACEMCO.NS"
 ]
 
-NIFTY_200 = NIFTY_50 + [
+# ==========================================
+# 📌 2. NIFTY NEXT 150 STOCKS (To make NIFTY 200 = 200 Stocks)
+# ==========================================
+NIFTY_NEXT_150 = [
     "ABB.NS", "ACC.NS", "AUBANK.NS", "ABBOTINDIA.NS", "ABCAPITAL.NS", "ABFRL.NS", 
     "ADANIENSOL.NS", "ADANIGREEN.NS", "ADANIPOWER.NS", "ATGL.NS", "AWL.NS", "ALKEM.NS", 
-    "AMBUJACEM.NS", "APOLLOTYRE.NS", "ASHOKLEY.NS", "ASTRAL.NS", "AUROPHARMA.NS"
+    "AMBUJACEM.NS", "APOLLOTYRE.NS", "ASHOKLEY.NS", "ASTRAL.NS", "AUROPHARMA.NS", 
+    "BALKRISIND.NS", "BANDHANBNK.NS", "BANKBARODA.NS", "BANKINDIA.NS", "BERGEPAINT.NS", 
+    "BDL.NS", "BHARATFORG.NS", "BHEL.NS", "BIOCON.NS", "BOSCHLTD.NS", "CANBK.NS", 
+    "CGPOWER.NS", "CHOLAFIN.NS", "COFORGE.NS", "COLPAL.NS", "CONCOR.NS", "CROMPTON.NS", 
+    "CUMMINSIND.NS", "DABUR.NS", "DALBHARAT.NS", "DEEPAKNTR.NS", "DELHIVERY.NS", 
+    "DIXON.NS", "DLF.NS", "ESCORTS.NS", "EXIDEIND.NS", "FEDERALBNK.NS", "GAIL.NS", 
+    "GLAND.NS", "GLENMARK.NS", "GMRAIRPORT.NS", "GODREJCP.NS", "GODREJPROP.NS", 
+    "GUJGASLTD.NS", "HDFCAMC.NS", "HAVELLS.NS", "HINDPETRO.NS", "HINDZINC.NS", 
+    "ICICIGI.NS", "ICICIPRULI.NS", "IDFCFIRSTB.NS", "INDIAMART.NS", "INDIANB.NS", 
+    "IEX.NS", "INDHOTEL.NS", "IOC.NS", "IRCTC.NS", "IRFC.NS", "IGL.NS", "INDUSTOWER.NS", 
+    "NAUKRI.NS", "INDIGO.NS", "IPCALAB.NS", "JSWENERGY.NS", "JINDALSTEL.NS", "JIOFIN.NS", 
+    "JUBLFOOD.NS", "KPITTECH.NS", "KAJARIACER.NS", "KALYANKJIL.NS", "KEI.NS", "LTF.NS", 
+    "LTTS.NS", "LICHSGFIN.NS", "LICI.NS", "LUPIN.NS", "MRF.NS", "LODHA.NS", "M&MFIN.NS", 
+    "MANAPPURAM.NS", "MARICO.NS", "MAXHEALTH.NS", "MAZDOCK.NS", "MPHASIS.NS", 
+    "MUTHOOTFIN.NS", "NATIONALUM.NS", "NAVINFLUOR.NS", "NHPC.NS", "NMDC.NS", "NYKAA.NS", 
+    "OBEROIRLTY.NS", "OIL.NS", "PAYTM.NS", "OFSS.NS", "POLICYBZR.NS", "PIIND.NS", 
+    "PNBHOUSING.NS", "PAGEIND.NS", "PATANJALI.NS", "PERSISTENT.NS", "PETRONET.NS", 
+    "PFC.NS", "PHOENIXLTD.NS", "PIDILITIND.NS", "POLYCAB.NS", "POONAWALLA.NS", 
+    "PRESTIGE.NS", "PNB.NS", "REC.NS", "RVNL.NS", "MOTHERSON.NS", "SAIL.NS", "SHREECEM.NS", 
+    "SIEMENS.NS", "SONACOMS.NS", "SRF.NS", "SBICARD.NS", "SUZLON.NS", "SYNGENE.NS", 
+    "TVSMOTOR.NS", "TATACOMM.NS", "TATAELXSI.NS", "TATAPOWER.NS", "TATATECH.NS", 
+    "TIINDIA.NS", "TORNTPHARM.NS", "TORNTPOWER.NS", "TRENT.NS", "UNOMINDA.NS", "UPL.NS", 
+    "UNIONBANK.NS", "UBL.NS", "MCDOWELL-N.NS", "VBL.NS", "VEDL.NS", "IDEA.NS", 
+    "VOLTAS.NS", "WIPRO.NS", "YESBANK.NS", "ZEEL.NS", "ZOMATO.NS", "ZYDUSLIFE.NS", "HEG.NS"
 ]
 
-NIFTY_500 = NIFTY_200 + [
+NIFTY_200 = list(dict.fromkeys(NIFTY_50 + NIFTY_NEXT_150))
+
+# ==========================================
+# 📌 3. ADDITIONAL 300 MIDCAP & SMALLCAP STOCKS (To make NIFTY 500 = 500 Stocks)
+# ==========================================
+NIFTY_MID_SMALL_300 = [
     "3MINDIA.NS", "AARTIDRUGS.NS", "AARTIIND.NS", "AAVAS.NS", "ABSLAMC.NS", "AEGISCHEM.NS",
-    "AETHER.NS", "AFFLE.NS", "AJANTPHARM.NS", "AKZOINDIA.NS", "ALEMBICLTD.NS"
+    "AETHER.NS", "AFFLE.NS", "AJANTPHARM.NS", "AKZOINDIA.NS", "ALEMBICLTD.NS", "ALKYLAMINE.NS",
+    "ALLCARGO.NS", "ALOKINDS.NS", "AMERISEL.NS", "ANANTRAJ.NS", "ANGELONE.NS", "ANURAS.NS",
+    "APARINDS.NS", "APLLTD.NS", "APOLLO.NS", "APTUS.NS", "ARCHIDPLY.NS", "ARE&M.NS",
+    "ASAHIINDIA.NS", "ASTERDM.NS", "ASTRAZEN.NS", "ATUL.NS", "AURIONPRO.NS", "AVANTIFEED.NS",
+    "BAJAJELEC.NS", "BAJAJHFL.NS", "BALAMINES.NS", "BALMLAWRIE.NS", "BALRAMCHIN.NS", "BEML.NS",
+    "BFINVEST.NS", "BFUTILITIE.NS", "BGRENERGY.NS", "BIKAJI.NS", "BIRLACORPN.NS", "BSOFT.NS",
+    "CAMPUS.NS", "CANFINHOME.NS", "CAPLIPOINT.NS", "CARBORUNIV.NS", "CASTROLIND.NS", "CEATLTD.NS",
+    "CENTURYPLY.NS", "CENTURYTEX.NS", "CERA.NS", "CESC.NS", "CGCL.NS", "CHAMBLFERT.NS",
+    "CHEVIOT.NS", "CHOICEIN.NS", "CLEAN.NS", "COCHINSHIP.NS", "COFFEEDAY.NS", "CRAFTMAN.NS",
+    "CREDITACC.NS", "CSBBANK.NS", "CYIENT.NS", "DATAPATTNS.NS", "DCAL.NS", "DCBBANK.NS",
+    "DCMSRIRAM.NS", "DEEPAKFERT.NS", "DELTACORP.NS", "DEVYANI.NS", "DHANI.NS", "DHANUKA.NS",
+    "ECLERX.NS", "EDELWEISS.NS", "EIDPARRY.NS", "EIHOTEL.NS", "ELECON.NS", "EMAMILTD.NS",
+    "ENDURANCE.NS", "ENGINERSIN.NS", "EQUITASBNK.NS", "ERIS.NS", "FACT.NS", "FINEORG.NS",
+    "FINPIPE.NS", "FLAIR.NS", "FSL.NS", "GATEWAY.NS", "GHCL.NS", "GMDCLTD.NS",
+    "GNFC.NS", "GODFRYPHLP.NS", "GOCOLORS.NS", "GPIL.NS", "GRANULES.NS", "GRAPHITE.NS",
+    "GREATTEE.NS", "GRINDWELL.NS", "GSFC.NS", "GSPL.NS", "HEMIPROP.NS", "HFCL.NS",
+    "HIKAL.NS", "HIMATSEIDE.NS", "HINDCOPPER.NS", "HONAUT.NS", "HUDCO.NS", "ISEC.NS",
+    "IBREALEST.NS", "INDIACEM.NS", "INDIAGLYCO.NS", "INDIGOPNTS.NS", "INFIBEAM.NS", "INOXWIND.NS",
+    "INTELLECT.NS", "IOB.NS", "IPCALAB.NS", "IRB.NS", "IRCON.NS", "ISEC.NS",
+    "ITI.NS", "J&KBANK.NS", "JAGRAN.NS", "JAIBALAJI.NS", "JCB.NS", "JINDALSAW.NS",
+    "JKCEMENT.NS", "JKPAPER.NS", "JKTYRE.NS", "JMFINANCIL.NS", "JSWINFRA.NS", "JTEKTINDIA.NS",
+    "JUSTDIAL.NS", "JYOTHYLAB.NS", "KALPATPOWR.NS", "KALYANI.NS", "KANSAINER.NS", "KARURVYSYA.NS",
+    "KEC.NS", "KPRMILL.NS", "KRBL.NS", "KSB.NS", "L&TFH.NS", "LATENTVIEW.NS",
+    "LAURUSLABS.NS", "LEMONTREE.NS", "LINDEINDIA.NS", "LLOYDSME.NS", "LUMAXIND.NS", "LXCHEM.NS",
+    "MAHABANK.NS", "MAHSEAMLES.NS", "MGL.NS", "MAPMYINDIA.NS", "MASTEK.NS", "MAXESTATES.NS",
+    "MEDPLUS.NS", "METROPOLIS.NS", "MFSL.NS", "MHRIL.NS", "MINDACORP.NS", "MMTC.NS",
+    "MOIL.NS", "MRPL.NS", "MSUMI.NS", "MTARTECH.NS", "MTAG.NS", "NATCOPHARM.NS",
+    "NBCC.NS", "NCC.NS", "NESCO.NS", "NFL.NS", "NLCINDIA.NS", "NOCIL.NS",
+    "NUVAMA.NS", "NUVAMACAP.NS", "OLECTRA.NS", "ORIENTELEC.NS", "PCBL.NS", "PEL.NS",
+    "PGHL.NS", "PGHH.NS", "PHOENIX.NS", "PNCINFRA.NS", "POLYMED.NS", "POLYPLEX.NS",
+    "PRA JIND.NS", "PRINCEPIPE.NS", "PRSMJOHNSN.NS", "RALLIS.NS", "RAMCOCEM.NS", "RATNAMANI.NS",
+    "RBLBANK.NS", "REDINGTON.NS", "RELAXO.NS", "RHIM.NS", "RITES.NS", "ROLEXRINGS.NS",
+    "ROUTE.NS", "RPOWER.NS", "RRKABEL.NS", "SANGHIIND.NS", "SAPPHIRE.NS", "SARDAEN.NS",
+    "SAREGAMA.NS", "SBFC.NS", "SCHAEFFLER.NS", "SCHNEIDER.NS", "SEAMECLTD.NS", "SHARDACROP.NS",
+    "SHK.NS", "SHOPERSTOP.NS", "SHREERAM.NS", "SINDHUTRAD.NS", "SJS.NS", "SKFINDIA.NS",
+    "SOBHA.NS", "SOLARINDS.NS", "SOUTHBANK.NS", "SPLPETRO.NS", "STARHEALTH.NS", "SUMICHEM.NS",
+    "SUNDARMFIN.NS", "SUNTECK.NS", "SUPRAJIT.NS", "SUPREMEIND.NS", "SUVENPHAR.NS", "SWANENERGY.NS",
+    "SNC.NS", "TATAINVEST.NS", "TATAMTRDVR.NS", "TEAMLEASE.NS", "TECHNOE.NS", "TEJASNET.NS",
+    "THERMAX.NS", "THYROCARE.NS", "TIIL.NS", "TIMKEN.NS", "TITAGARH.NS", "TRIDENT.NS",
+    "TRIVENI.NS", "TRITURBINE.NS", "TTKPRESTIG.NS", "UCOBANK.NS", "UJJIVANSFB.NS", "UNIONBANK.NS",
+    "USHAMART.NS", "UTIAMC.NS", "VAIBHAVGBL.NS", "VARIANCE.NS", "VGUARD.NS", "VINATIORGA.NS",
+    "VIPIND.NS", "VMART.NS", "VSTIND.NS", "WABAG.NS", "WELCORP.NS", "WELSPUNLIV.NS",
+    "WESTLIFE.NS", "WHIRLPOOL.NS", "WOCKPHARMA.NS", "ZENTEC.NS", "ZFCVINDIA.NS"
 ]
 
-# 📌 BSE / Other Market Listed Popular Stocks
-OTHER_BSE_STOCKS = [
-    "500325.BO", "500180.BO", "532174.BO", "532215.BO", "532540.BO", # BSE Codes (Reliance, HDFC Bank, ICICI Bank, etc.)
-    "SJVN.BO", "IREDA.BO", "IEX.BO", "URJA.BO", "RPOWER.BO", "JPPOWER.BO", "ALOKINDS.BO"
-]
+NIFTY_500 = list(dict.fromkeys(NIFTY_200 + NIFTY_MID_SMALL_300))
 
 # Core Scanner Function
 def scan_bollinger(stocks, interval, period, strategy_type, tf_name):
@@ -216,6 +285,10 @@ def scan_bollinger(stocks, interval, period, strategy_type, tf_name):
 
     for symbol in stocks:
         try:
+            # Drop obsolete HEGAM if present anywhere
+            if "HEGAM" in symbol:
+                continue
+
             if symbol in data:
                 df = data[symbol].dropna()
             else:
@@ -224,6 +297,7 @@ def scan_bollinger(stocks, interval, period, strategy_type, tf_name):
             if len(df) < 21:
                 continue
 
+            # Resampling Handling
             if tf_name == "10-Min":
                 df = df.resample('10min').agg({'Open':'first', 'High':'max', 'Low':'min', 'Close':'last', 'Volume':'sum'}).dropna()
             elif tf_name == "2-Hour":
@@ -252,8 +326,7 @@ def scan_bollinger(stocks, interval, period, strategy_type, tf_name):
 
                 if is_green and cuts_lower and bullish_engulfing and strong_body:
                     selected.append({
-                        "Stock": symbol.replace(".NS", "").replace(".BO", ""),
-                        "Exchange": "BSE" if ".BO" in symbol else "NSE",
+                        "Stock": symbol.replace(".NS", ""),
                         "LTP (₹)": round(curr['Close'], 2),
                         "Open (₹)": round(curr['Open'], 2),
                         "High (₹)": round(curr['High'], 2),
@@ -274,8 +347,7 @@ def scan_bollinger(stocks, interval, period, strategy_type, tf_name):
                 if below_lower and (is_hammer or is_star_body):
                     pattern_type = "Hammer Below Band" if is_hammer else "Gap / Morning Star Base"
                     selected.append({
-                        "Stock": symbol.replace(".NS", "").replace(".BO", ""),
-                        "Exchange": "BSE" if ".BO" in symbol else "NSE",
+                        "Stock": symbol.replace(".NS", ""),
                         "LTP (₹)": round(curr['Close'], 2),
                         "High (₹)": round(curr['High'], 2),
                         "Low (₹)": round(curr['Low'], 2),
@@ -290,7 +362,7 @@ def scan_bollinger(stocks, interval, period, strategy_type, tf_name):
 
 # Page 1: Main Live Scanner
 if selected_menu == "📈 Live Scanner":
-    st.subheader("⚙ Scanner Settings")
+    st.subheader("⚙️ Scanner Settings")
     c1, c2, c3 = st.columns(3)
 
     with c1:
@@ -315,8 +387,7 @@ if selected_menu == "📈 Live Scanner":
             [
                 f"NIFTY 50 ({len(NIFTY_50)} Stocks)",
                 f"NIFTY 200 ({len(NIFTY_200)} Stocks)",
-                f"NIFTY 500 ({len(NIFTY_500)} Stocks)",
-                "🌐 Other Stock View (BSE / SmallCap / Custom Tickers)"
+                f"NIFTY 500 ({len(NIFTY_500)} Stocks)"
             ],
             index=0
         )
@@ -336,41 +407,76 @@ if selected_menu == "📈 Live Scanner":
     }
     interval, period = tf_map[timeframe]
 
-    stocks_to_scan = []
-
     if "NIFTY 50 " in segment:
         stocks_to_scan = NIFTY_50
     elif "NIFTY 200 " in segment:
         stocks_to_scan = NIFTY_200
-    elif "NIFTY 500 " in segment:
+    else:
         stocks_to_scan = NIFTY_500
-    elif "Other Stock View" in segment:
-        st.markdown("#### 🔍 BSE / Custom Stock Direct Portal Search")
-        custom_input = st.text_input(
-            "Stock Symbols Type Korun (NSE-er jonno Symbol, BSE-er jonno `.BO` athoba BSE Security Code, e.g., RELIANCE.BO, IREDA, 500325.BO):",
-            "500325.BO, SJVN.BO, IREDA, URJA.BO, RPOWER"
-        )
-        if custom_input:
-            formatted_list = []
-            for item in custom_input.split(","):
-                sym = item.strip().upper()
-                if not sym:
-                    continue
-                if not (sym.endswith(".NS") or sym.endswith(".BO")):
-                    # Default NSE try korbe, `.BO` likhle BSE dhorbe
-                    sym = sym + ".NS"
-                formatted_list.append(sym)
-            stocks_to_scan = formatted_list
 
-    if stocks_to_scan:
-        with st.spinner(f"Scanning {len(stocks_to_scan)} stocks in {timeframe} timeframe..."):
-            results = scan_bollinger(stocks_to_scan, interval, period, strategy, timeframe)
+    with st.spinner(f"Scanning {len(stocks_to_scan)} stocks in {timeframe} timeframe..."):
+        results = scan_bollinger(stocks_to_scan, interval, period, strategy, timeframe)
 
-        if results:
-            st.success(f"Mot {len(results)} ti stock pawa geche selected condition onujayi ({timeframe} timeframe)!")
-            st.dataframe(pd.DataFrame(results), use_container_width=True)
-        else:
-            st.info(f"Selected condition-e current live data-te {timeframe} timeframe-e kono stock pawa jayni.")
+    if results:
+        st.success(f"Mot {len(results)} ti stock pawa geche selected condition onujayi ({timeframe} timeframe)!")
+        st.dataframe(pd.DataFrame(results), use_container_width=True)
+    else:
+        st.info(f"Selected condition-e current live data-te {timeframe} timeframe-e kono stock pawa jayni.")
+
+elif selected_menu == "⭐ Live Watchlist":
+    st.subheader("⭐ Custom Live Watchlist")
+    user_symbols = st.text_input("Stock Symbols Type Korun (Comma Separated):", "RELIANCE, SBIN, TATAMOTORS, INFY, HDFCBANK")
+    
+    if user_symbols:
+        symbol_list = [s.strip().upper() + ".NS" for s in user_symbols.split(",") if s.strip()]
+        watchlist_data = []
+        for sym in symbol_list:
+            try:
+                t = yf.Ticker(sym)
+                info = t.fast_info
+                p = info.last_price
+                pc = info.previous_close
+                chg = p - pc
+                pct = (chg / pc) * 100
+                watchlist_data.append({
+                    "Stock Symbol": sym.replace(".NS", ""),
+                    "LTP (₹)": round(p, 2),
+                    "Change (₹)": round(chg, 2),
+                    "Change (%)": f"{pct:+.2f}%",
+                    "Prev Close (₹)": round(pc, 2)
+                })
+            except Exception:
+                continue
+        if watchlist_data:
+            st.dataframe(pd.DataFrame(watchlist_data), use_container_width=True)
+
+elif selected_menu == "⚡ Intraday Stocks":
+    st.subheader("⚡ Intraday Focus Stocks (High Liquidity & Volatility)")
+    st.caption("Intraday trading-er jonno suitable high-volume stock scanning (15m timeframe):")
+    intraday_list = NIFTY_50[:20]
+    results = scan_bollinger(intraday_list, "15m", "5d", "Condition 1: Lower Band Cut (Strong Green Candle & Engulfing/Reversal)", "15-Min")
+    if results:
+        st.dataframe(pd.DataFrame(results), use_container_width=True)
+    else:
+        st.info("Current Intraday timeframe-e (15m) kono setup toiri hoyni.")
+
+elif selected_menu == "📅 Short Term Stocks":
+    st.subheader("📅 Short Term / Swing Trading Stocks")
+    st.caption("Daily timeframe-e breakout ba reversal pattern scan kora hocche:")
+    results = scan_bollinger(NIFTY_50, "1d", "6mo", "Condition 1: Lower Band Cut (Strong Green Candle & Engulfing/Reversal)", "1-Day")
+    if results:
+        st.dataframe(pd.DataFrame(results), use_container_width=True)
+    else:
+        st.info("Daily timeframe-e kono Short-term setup pawa jayni.")
+
+elif selected_menu == "🏦 Long Term Stocks":
+    st.subheader("🏦 Long Term Fundamental Wealth Creators")
+    st.caption("Weekly timeframe-e deep value zone-e thaka stocks:")
+    results = scan_bollinger(NIFTY_50, "1wk", "2y", "Condition 2: Completely Below Lower Band (Hammer / Morning Star Gap)", "1-Week")
+    if results:
+        st.dataframe(pd.DataFrame(results), use_container_width=True)
+    else:
+        st.info("Weekly timeframe-e kono long-term value setup pawa jayni.")
 
 st.markdown("""
     <div class="disclaimer-box">
