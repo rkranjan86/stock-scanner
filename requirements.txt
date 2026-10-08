@@ -1,5 +1,6 @@
-streamlit>=1.30.0
-yfinance>=0.2.35
-pandas>=2.0.0
-pytz>=2023.3
-requests>=2.31.0
+fastapi==0.115.14
+uvicorn[standard]==0.34.3
+python-dotenv==1.1.0
+requests==2.32.4
+pandas==2.3.1
+upstox-python-sdk==2.23.0
