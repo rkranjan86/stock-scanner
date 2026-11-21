@@ -2996,7 +2996,7 @@ st.markdown("""
 <style>
 .ft{margin-top:28px;background:#0b5d46;color:#fff;border-radius:8px;padding:22px 26px;
     display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
-.ft h4{margin:0 0 10px;font-size:16px;color:#fff}
+.ft .fh{margin:0 0 10px;font-size:16px;font-weight:700;color:#fff}
 .ft p{margin:0;font-size:13px;opacity:.9;line-height:1.6}
 .ft a{display:block;color:#fff;text-decoration:none;font-size:14px;padding:3px 0;opacity:.9}
 .ft a:hover{opacity:1;text-decoration:underline}
@@ -3005,18 +3005,18 @@ st.markdown("""
 </style>
 <div class="ft">
   <div>
-    <h4>stock২minit</h4>
+    <div class="fh">stock২minit</div>
     <p>NSE স্টকের জন্য AI স্টক স্ক্যানার। Bollinger Band ও candle pattern দিয়ে কোন শেয়ার ওপরে যেতে পারে তা খুঁজে দেয়।</p>
   </div>
   <div>
-    <h4>দ্রুত লিংক</h4>
+    <div class="fh">দ্রুত লিংক</div>
     <a href="#">হোম</a>
     <a href="#">স্ক্যানার</a>
     <a href="#">Nifty 200</a>
     <a href="#">Nifty 500</a>
   </div>
   <div>
-    <h4>যোগাযোগ</h4>
+    <div class="fh">যোগাযোগ</div>
     <a href="#">আমাদের সম্পর্কে</a>
     <a href="#">গোপনীয়তা নীতি</a>
     <a href="#">শর্তাবলী</a>
