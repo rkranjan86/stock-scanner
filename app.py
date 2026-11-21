@@ -2990,3 +2990,38 @@ every = "60s" if (q0 and q0["auto"] and q0["tf"] in INTRADAY and market_open()) 
 st.fragment(results, run_every=every)()
 st.caption("⚠ শুধু শিক্ষামূলক টুল, বিনিয়োগ পরামর্শ নয়। Yahoo ডেটায় ১৫ মিনিট পর্যন্ত delay থাকতে পারে। "
            "সিগন্যাল মানে সম্ভাবনা মাত্র — কেনার আগে চার্ট নিজে দেখুন।")
+
+# ---------- ফুটার (৩ কলাম) ----------
+st.markdown("""
+<style>
+.ft{margin-top:28px;background:#0b5d46;color:#fff;border-radius:8px;padding:22px 26px;
+    display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+.ft h4{margin:0 0 10px;font-size:16px;color:#fff}
+.ft p{margin:0;font-size:13px;opacity:.9;line-height:1.6}
+.ft a{display:block;color:#fff;text-decoration:none;font-size:14px;padding:3px 0;opacity:.9}
+.ft a:hover{opacity:1;text-decoration:underline}
+.ft-end{text-align:center;font-size:12px;color:#5d6b63;margin:10px 0 4px}
+@media(max-width:700px){.ft{grid-template-columns:1fr}}
+</style>
+<div class="ft">
+  <div>
+    <h4>stock২minit</h4>
+    <p>NSE স্টকের জন্য AI স্টক স্ক্যানার। Bollinger Band ও candle pattern দিয়ে কোন শেয়ার ওপরে যেতে পারে তা খুঁজে দেয়।</p>
+  </div>
+  <div>
+    <h4>দ্রুত লিংক</h4>
+    <a href="#">হোম</a>
+    <a href="#">স্ক্যানার</a>
+    <a href="#">Nifty 200</a>
+    <a href="#">Nifty 500</a>
+  </div>
+  <div>
+    <h4>যোগাযোগ</h4>
+    <a href="#">আমাদের সম্পর্কে</a>
+    <a href="#">গোপনীয়তা নীতি</a>
+    <a href="#">শর্তাবলী</a>
+    <a href="mailto:your@email.com">your@email.com</a>
+  </div>
+</div>
+<div class="ft-end">© 2026 stock২minit · শুধু শিক্ষামূলক, বিনিয়োগ পরামর্শ নয়</div>
+""", unsafe_allow_html=True)
