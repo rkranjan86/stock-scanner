@@ -2834,7 +2834,7 @@ nav a:first-child,nav a:hover{background:rgba(255,255,255,.2)}
 .c{text-align:right;font-variant-numeric:tabular-nums}.c b{font-size:20px;display:block}.c span{font-size:12px;opacity:.9}
 </style>
 <div class="h"><div class="logo">stock২minit<small>AI Stock Scanner</small></div>
-<nav><a href="https://stock2minit.streamlit.app">হোম</a><a href="#">শর্ট টার্ম স্টক </a><a href="#">লং টার্ম স্টক</a><a href="<a href="https://rkranjan86.github.io/stock-scanner/trading.html" target="_top">ট্রেডিং কিভাবে করবেন</a><a href="#">শেয়ার মার্কেট খবর</a></nav>
+<nav><a href="https://stock2minit.streamlit.app">হোম</a><a href="#">শর্ট টার্ম স্টক </a><a href="#">লং টার্ম স্টক</a><a href="<a href="trading.html">ট্রেডিং কিভাবে করবেন</a><a href="#">শেয়ার মার্কেট খবর</a></nav>
 <div class="c"><b id="t">--:--:--</b><span id="d"></span> · <span id="m"></span></div></div>
 <script>
 function tick(){const n=new Date(),o={timeZone:'Asia/Kolkata'};
