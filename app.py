@@ -2829,23 +2829,30 @@ body{margin:0;font-family:'Segoe UI','Noto Sans Bengali',sans-serif}
 .h{display:flex;align-items:center;gap:20px;padding:10px 18px;background:#0b5d46;color:#fff;border-radius:8px;flex-wrap:wrap}
 .logo{font:800 24px Georgia,serif}.logo small{display:block;font:500 11px sans-serif;opacity:.8}
 nav{flex:1;display:flex;gap:6px;flex-wrap:wrap}
-nav a{color:#fff;text-decoration:none;padding:6px 12px;border-radius:6px;font-weight:600;font-size:14px}
+nav a{color:#fff;text-decoration:none;padding:6px 12px;border-radius:6px;font-weight:600;font-size:14px;cursor:pointer}
 nav a:first-child,nav a:hover{background:rgba(255,255,255,.2)}
 .c{text-align:right;font-variant-numeric:tabular-nums}.c b{font-size:20px;display:block}.c span{font-size:12px;opacity:.9}
 </style>
-<div class="h"><div class="logo">stock২minit<small>AI Stock Scanner</small></div>
-<nav><a href="https://stock2minit.streamlit.app">হোম</a><a href="#">শর্ট টার্ম স্টক </a><a href="#">লং টার্ম স্টক</a><a href="<a href="trading.html">ট্রেডিং কিভাবে করবেন</a><a href="#">শেয়ার মার্কেট খবর</a></nav>
+<div class="h" id="hd"><div class="logo">stock২minit<small>AI Stock Scanner</small></div>
+<nav>
+<a onclick="goTop()">হোম</a>
+<a onclick="goTop()">স্ক্যানার</a>
+<a onclick="goTop()">Nifty 200</a>
+<a onclick="goTop()">Nifty 500</a>
+<a href="https://rkranjan86.github.io/stock-scanner/trading.html" target="_top">ট্রেডিং কিভাবে করবেন</a>
+</nav>
 <div class="c"><b id="t">--:--:--</b><span id="d"></span> · <span id="m"></span></div></div>
 <script>
+function goTop(){try{var p=window.parent;p.scrollTo(0,0);var m=p.document.querySelector('[data-testid="stMain"]');if(m)m.scrollTo(0,0)}catch(e){}}
+function fit(){try{window.frameElement.style.height=(document.getElementById('hd').offsetHeight+6)+'px'}catch(e){}}
 function tick(){const n=new Date(),o={timeZone:'Asia/Kolkata'};
 document.getElementById('t').textContent=n.toLocaleTimeString('en-GB',o);
 document.getElementById('d').textContent=n.toLocaleDateString('bn-IN',{...o,weekday:'short',day:'numeric',month:'long',year:'numeric'});
 const p=new Intl.DateTimeFormat('en-GB',{...o,weekday:'short',hour:'2-digit',minute:'2-digit',hour12:false}).formatToParts(n).reduce((a,x)=>(a[x.type]=x.value,a),{});
 const m=+p.hour*60+ +p.minute;const open=!['Sat','Sun'].includes(p.weekday)&&m>=555&&m<=930;
-document.getElementById('m').textContent=open?'মার্কেট খোলা':'মার্কেট বন্ধ'}
-tick();setInterval(tick,1000)
-</script>""", height=82)
-
+document.getElementById('m').textContent=open?'মার্কেট খোলা':'মার্কেট বন্ধ';fit()}
+tick();setInterval(tick,1000);window.addEventListener('load',fit);window.addEventListener('resize',fit);
+</script>""", height=110)
 
 def market_open():
     n = datetime.now(IST)
